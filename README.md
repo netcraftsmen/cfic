@@ -19,17 +19,30 @@ Which use case(s) are you planning on addressing with your solution?*
 
  * Software Lifecycle Management- _Integrating Software Image Management into the network pipeline by automating upgrades based on external events. For example, using the OpenVuln PSIRT API, a workflow is instantiated that upgrades software based on a published security vulnerability - This includes executing tests post-upgrade and report generation. OpenSource tooling is preferable (PyATS, Batfish, TextFSM). Additional points if reporting can map to federal standards such as RMF._
 
- * Closed Loop Automation- _Using telemetry generated from the network and data visualization to execute pipeline workflows. Example use cases are traffic flow optimization, Cyber-attack simulation, etc. Additional points for integration into AI or ML tooling such as ChatGPT, Bard, etc._
+ * **Closed Loop Automation**- _Using telemetry generated from the network and data visualization to execute pipeline workflows. Example use cases are traffic flow optimization, Cyber-attack simulation, etc. Additional points for integration into AI or ML tooling such as ChatGPT, Bard, etc._
 
 
-Why did you choose to address this use case (or use cases)?*
+**Why did you choose to address this use case (or use cases)?**
 
-What specific customer problem(s) do you plan to address?*
+The use of telemetry is an increased focus in IT operations providing raw data to the Machine Learning / Artificial Intelligence (ML/AI) algorithms for AIOps (Artificial Intelligence for IT Operations) and Security Orchestration, Automation, and Response Solution (SOAR) solutions.
 
-Please provide a description of your proposed idea:*
+There are open source tools to receive telemetry data, store it, visualize and alert; how should the network operator provide access to infrastructure telemetry data, in real-time, at scale across all technology stakeholders?
 
-How does your idea relate to the use case(s) you selected above?*
+Apache Kafka is an event streaming service enabling access to network telemetry across the organization for a variety of functions that include security alerting and auditing of clients accessing the network as well as more traditional uses like uplink and wireless utilization. 
 
+Event-Driven Ansible by Red Hat enables access to Apache Kafka with a familiar tool set leveraging Certified Content Collections from a wide range of partners including Cisco, IBM and ServiceNow.
+
+**What specific customer problem(s) do you plan to address?**
+
+Initial network automation approaches focused on the integrations of systems in a client/server architecture using Application Programming Interfaces (APIs). Just as software applications have evolved to a service orientated, loosely coupled architecture, so should how modern networks are managed and audited.
+
+**Please provide a description of your proposed idea:**
+
+The solution demonstrates how previously developed network and security automation software (published on Cisco DevNet Code Exchange) can be integrated into an extensible system leveraging cloud managed services, open-source software and OEM product offerings.
+
+**How does your idea relate to the use case(s) you selected above?**
+
+The solution adopts service-oriented approach to the publishing and consumption of network telemetry data. While the solution can be extended to Cisco networking (routers, switches, firewalls), the implementation leverages the Meraki API to publish both clients observed on a Meraki network along with network uplink statistics to a Kafka event streaming service. Utilizing Event-Driven Ansible, the telemetry is consumed for auditing, alerting and remediation by IT management systems and SOAR implementations.
 
 ## Invitation
 
