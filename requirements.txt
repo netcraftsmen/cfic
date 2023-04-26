@@ -1,0 +1,5 @@
+pyyaml
+ansible
+# Documentation https://ansible-runner.readthedocs.io/en/stable/
+ansible-runner
+ansible-rulebook

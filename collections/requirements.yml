@@ -1,0 +1,14 @@
+#
+#  Ansible Tower looks in collections/requirements.yml for collections to install
+#
+collections:
+    #
+    # Install collection(s) from Ansible Galaxy.
+    #
+  - name: community.general
+    # removed versioning for error ERROR! Unable to extract 'tests/integration/targets/django_manage
+    # version: 3.5.0    # Requires Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
+    source: https://galaxy.ansible.com
+
+  - name: ansible.eda
+    source: https://galaxy.ansible.com

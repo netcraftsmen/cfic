@@ -1,0 +1,7 @@
+# Ansible Runner directory
+playbooks/artifacts
+.DS_Store
+#
+# Do not push private OPENSSH keys
+#
+playbooks/files/*.cer
