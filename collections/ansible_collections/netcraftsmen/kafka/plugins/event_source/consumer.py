@@ -21,7 +21,7 @@ Arguments:
 
 
 """
-
+import os
 import asyncio
 import json
 import logging
@@ -40,7 +40,8 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
     certfile = args.get("certfile")
     keyfile = args.get("keyfile")
     password = args.get("password")
-    check_hostname = args.get("check_hostname", True)
+    username = args.get("username")
+    check_hostname = args.get("check_hostname", False)
     group_id = args.get("group_id", None)
     offset = args.get("offset", "latest")
 
@@ -67,8 +68,8 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         # ssl_context=context if cafile else None,
         security_protocol='SASL_SSL',
         sasl_mechanism='PLAIN',
-        sasl_plain_password=os.environ.get('CLUSTER_API_SECRET'), 
-        sasl_plain_username=os.environ.get('CLUSTER_API_KEY')
+        sasl_plain_password=password,
+        sasl_plain_username=username
     )
 
     await kafka_consumer.start()
@@ -86,8 +87,23 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
 
 if __name__ == "__main__":
 
+    # For testing outside of Ansible
+    args = dict(
+                password=os.environ.get('CLUSTER_API_SECRET'),
+                username=os.environ.get('CLUSTER_API_KEY'),
+                topic=os.environ.get('TOPIC', 'topic_0'),
+                # pkc-n00kk.us-east-1.aws.confluent.cloud:9092
+                host=os.environ.get('BOOTSTRAP_SERVER').split(':')[0],
+                port=os.environ.get('BOOTSTRAP_SERVER').split(':')[1],
+                cafile=None,
+                certfile=None,
+                keyfile=None,
+                check_hostname=False,
+                offset="latest"
+                )
+
     class MockQueue:
         async def put(self, event):
             print(event)
 
-    asyncio.run(main(MockQueue(), {"topic": "eda", "host": "localhost", "port": "9092", "group_id": "test"}))
+    asyncio.run(main(MockQueue(), **args))

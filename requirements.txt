@@ -4,10 +4,12 @@ ansible
 # ansible-runner
 ansible-rulebook
 #
-azure-servicebus
-aiobotocore
-aiohttp
-aiokafka
-watchdog
-systemd-python
-dpath
+#  The following error when building in the VS Code docker container, but not on Ubuntu
+#
+# azure-servicebus
+# aiobotocore
+# aiohttp
+# aiokafka
+# watchdog
+# systemd-python
+# dpath
