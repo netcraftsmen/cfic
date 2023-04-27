@@ -66,7 +66,9 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         auto_offset_reset=offset,
         # security_protocol="SSL" if cafile else "PLAINTEXT",
         # ssl_context=context if cafile else None,
-        security_protocol='SASL_SSL',
+        ssl_context=None,
+        # security_protocol='SASL_SSL',
+        security_protocol='SASL_PLAINTEXT',
         sasl_mechanism='PLAIN',
         sasl_plain_password=password,
         sasl_plain_username=username
@@ -75,7 +77,7 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
     await kafka_consumer.start()
 
     try:
-        async for msg in kafka_consumer:
+        async for msg in kafka_consumer: 
             try:
                 data = json.loads(msg.value)
                 await queue.put(data)
@@ -106,4 +108,6 @@ if __name__ == "__main__":
         async def put(self, event):
             print(event)
 
-    asyncio.run(main(MockQueue(), **args))
+    print(args)
+
+    asyncio.run(main(MockQueue(), args))
