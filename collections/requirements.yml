@@ -10,5 +10,5 @@ collections:
     # version: 3.5.0    # Requires Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
     source: https://galaxy.ansible.com
 
-  - name: ansible.eda
-    source: https://galaxy.ansible.com
+  # - name: ansible.eda
+  #   source: https://galaxy.ansible.com

@@ -1,5 +1,13 @@
 pyyaml
 ansible
 # Documentation https://ansible-runner.readthedocs.io/en/stable/
-ansible-runner
+# ansible-runner
 ansible-rulebook
+#
+azure-servicebus
+aiobotocore
+aiohttp
+aiokafka
+watchdog
+systemd-python
+dpath

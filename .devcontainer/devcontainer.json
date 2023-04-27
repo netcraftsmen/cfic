@@ -27,7 +27,7 @@
 	// "forwardPorts": [8000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "java -version",
+	"postCreateCommand": "whoami",
     // Use 'postAttachCommand' to run when attaching to the container.
 	"postAttachCommand": "ansible-galaxy collection list"
     // remove role list from postAttachCommand
