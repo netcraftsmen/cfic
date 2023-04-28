@@ -57,6 +57,10 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         )
         context.check_hostname = check_hostname
 
+    ### BEGIN HACK
+    context = create_ssl_context()
+    context.check_hostname = check_hostname
+    ### END HACK
     kafka_consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers="{0}:{1}".format(host, port),
@@ -66,9 +70,8 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         auto_offset_reset=offset,
         # security_protocol="SSL" if cafile else "PLAINTEXT",
         # ssl_context=context if cafile else None,
-        ssl_context=None,
-        # security_protocol='SASL_SSL',
-        security_protocol='SASL_PLAINTEXT',
+        ssl_context=context,
+        security_protocol='SASL_SSL',
         sasl_mechanism='PLAIN',
         sasl_plain_password=password,
         sasl_plain_username=username
