@@ -82,3 +82,32 @@ Following the installation, shut the Droplet and created a snapshot
 ## Create Kafka Broker
 
 https://developer.confluent.io/quickstart/kafka-docker/
+
+
+### Create the docker-compose.yml
+
+### Start the containers
+
+docker compose up -d
+
+### Create a topic
+
+docker exec broker \
+kafka-topics --bootstrap-server broker:9092 \
+             --create \
+             --topic cfic_0
+
+
+# Verify connectivity
+
+ nc -zv 68.183.30.227 9092
+Connection to 68.183.30.227 9092 port [tcp/*] succeeded!
+
+### Look at logs
+
+
+docker compose logs broker | grep 24.163.48.106
+
+Install the offset Explorer (UI tool)
+
+https://kafkatool.com/download.html
