@@ -67,3 +67,18 @@ ubuntu-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS
 #   Java home = /usr/lib/jvm/jdk-20
 #   Java version = 20.0.1
 #   Python version = 3.8.10 (default, Mar 13 2023, 10:26:41) [GCC 9.4.0]
+
+
+
+## Installed Docker on the Droplet
+
+Using these instructions, installed Docker to run Kafka in a container
+
+<https://docs.docker.com/engine/install/ubuntu/>
+
+Following the installation, shut the Droplet and created a snapshot
+
+
+## Create Kafka Broker
+
+https://developer.confluent.io/quickstart/kafka-docker/
