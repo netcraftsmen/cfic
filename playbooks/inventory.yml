@@ -1,1 +1,9 @@
 ---
+#
+# inventory.yml
+#
+#  export ANSIBLE_INVENTORY=./inventory.yml
+#
+all:
+  hosts:
+      localhost:

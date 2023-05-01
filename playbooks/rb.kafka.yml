@@ -12,23 +12,26 @@
   hosts: all
 
   sources:
-   - netcraftsmen.kafka.consumer:
-       host: pkc-n00kk.us-east-1.aws.confluent.cloud
-       port: 9092
-       # cafile:    The optional certificate authority file path containing certificates
-       # certfile:  The optional client certificate file path containing the client
-       # keyfile:   The optional client key file path containing the client private key
-       # password:  The optional password to be used when loading the certificate chain
-       check_hostname: False
-       encoding: utf-8
-       topic: cfic_0
-       group_id: group_1
-       offset: latest
+   # - netcraftsmen.kafka.consumer:
+   # consumer is in the current directory for now
+    - consumer:
+        host: pkc-n00kk.us-east-1.aws.confluent.cloud
+        port: 9092
+        username: # CLUSTER_API_KEY
+        password: # CLUSTER_API_SECRET
+        check_hostname: False
+        encoding: utf-8
+        topic: cfic_0
+        group_id: semaphore_1
+        offset: latest
 
   rules:
-   - name: Filter MAC address
-     condition: event.payload.message == "Ansible is super cool!"
+  
+    - name: match on anything
+      condition:  event.payload is defined
+      action:
+        debug:
+          var:  event.payload
 
-  action:
-    run_playbook:
-      name: pb.soar_artifact.yml
+        # run_playbook:
+          # name: pb.soar_artifact.yml

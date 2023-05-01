@@ -111,3 +111,9 @@ docker compose logs broker | grep 24.163.48.106
 Install the offset Explorer (UI tool)
 
 https://kafkatool.com/download.html
+
+
+
+## Documentation
+
+https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
