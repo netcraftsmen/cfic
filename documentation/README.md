@@ -13,6 +13,7 @@ Installation documentation when installing on Digital Ocean
 
 ubuntu-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
 
+```
 # https://www.oracle.com/java/technologies/downloads/
 # https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts
 #
@@ -68,7 +69,7 @@ ubuntu-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS
 #   Java version = 20.0.1
 #   Python version = 3.8.10 (default, Mar 13 2023, 10:26:41) [GCC 9.4.0]
 
-
+```
 
 ## Installed Docker on the Droplet
 
@@ -117,3 +118,8 @@ https://kafkatool.com/download.html
 ## Documentation
 
 https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
+
+
+## Splunk SOAR
+
+https://docs.splunk.com/Documentation/SOARonprem/6.0.0/Install/InstallAMI
