@@ -7,7 +7,8 @@
 #      Author: @joelwking
 #
 #      Usage: ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
-#
+#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v \
+#             --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC
 - name: Kafka consumer for Meraki clients
   hosts: all
 
@@ -15,22 +16,22 @@
    - netcraftsmen.kafka.consumer:
    # consumer is in the current directory for now
    # - consumer:
-        host: pkc-n00kk.us-east-1.aws.confluent.cloud
-        port: 9092
-        username: # CLUSTER_API_KEY
-        password: # CLUSTER_API_SECRET
+        host: pkc-n00kk.us-east-1.aws.confluent.cloud  # TODO
+        port: 9092  # TODO
+        username: "{{ CLUSTER_API_KEY }}"
+        password: "{{ CLUSTER_API_SECRET }}"
         check_hostname: False
         encoding: utf-8
-        topic: cfic_0
-        group_id: semaphore_1
-        offset: latest
+        topic: "{{ TOPIC }}"
+        group_id: semaphore_1  # TODO
+        offset: latest         # TODO
 
   rules:
     - name: match on anything
       condition:  event.payload is defined
       action:
-        debug:
-          var:  event.payload
+        # debug:
+        #  var:  event.payload
 
-        # run_playbook:
-          # name: pb.soar_artifact.yml
+        run_playbook:
+          name: pb.soar.yml
