@@ -24,35 +24,35 @@ Which use case(s) are you planning on addressing with your solution?*
 
 **Why did you choose to address this use case (or use cases)?**
 
-The network infrastructure is a distributed system containing abundant information regarding the operational state, configuration and capacity of network devices, their interconnections and the devices it supports. 
+The network infrastructure is a distributed system containing abundant information regarding network devices' operational state, configuration, capacity, interconnections, and the devices it supports. 
 
-A forward-thinking approach is to view the network as an Event-Driven System. Lightweight containerized agents act as event publishers of telemetry, the change in state in the network links, their configuration and attached devices.
+A forward-thinking approach is to view the network as an Event-Driven System. Lightweight containerized agents act as event publishers of telemetry, the change in state in the network links, their configuration, and attached devices.
 
 This approach aligns with a microservice architecture / service-oriented architecture structural style, where large applications are built as small, independent components which are highly extensible.
 
 The use of telemetry is an increased focus in IT operations providing raw data to the Machine Learning / Artificial Intelligence (ML/AI) algorithms for AIOps (Artificial Intelligence for IT Operations) and Security Orchestration, Automation, and Response Solution (SOAR) solutions.
 
-While there are open-source tools to receive telemetry data, store it, visualize and alert; how should the network operator provide access to infrastructure telemetry and events, in real-time, at scale, to current and future technology stakeholders? 
+While there are open-source tools to receive telemetry data, store it, visualize, and alert; how should the network operator provide access to infrastructure telemetry and events, in real-time, at scale, to current and future technology stakeholders? 
 
 **What specific customer problem(s) do you plan to address?**
 
-The goal of any solution should be to provide an extensible architectural framework that addresses the specific customer problem, and is readily extended to additional or unforeseen use cases.
+The goal of any solution should be to provide an extensible architectural framework that addresses the specific customer problem and is readily extended to additional or unforeseen use cases.
 
 The customer is a regulated business quickly deploying thousands of teleworker call center agents with Meraki Z3 devices. The security policy permits attaching corporate laptops. However, 'spouse and child' devices often appear on the remote network. A point solution was developed in the SOAR platform using the Meraki API to apply a 'quarantine' network until the offense could be remedied. Alerting and generating a ticket in the SOAR platform relied on log analysis by the SOC team.
 
 **Please provide a description of your proposed idea:**
 
-The solution demonstrates how previously developed network and security automation software ("semaphore", published on Cisco DevNet Code Exchange by BlueAlly NetCraftsmen, LLC) is integrated as an extensible system leveraging cloud managed services, open-source software and OEM product offerings.
+The solution demonstrates how previously developed network and security automation software ("semaphore", published on Cisco DevNet Code Exchange by BlueAlly NetCraftsmen, LLC) is integrated as an extensible system leveraging cloud-managed services, open-source software, and OEM product offerings.
 
 Network telemetry is published to Apache Kafka in Confluent Cloud. Apache Kafka is an event streaming service enabling access to network telemetry across the organization for functions including security alerting and auditing of clients accessing the network, and traditional uses like uplink and wireless utilization. 
 
 A rulebook using Event-Driven Ansible by Red Hat is used to consume events from Apache Kafka and generate incidents in the SOAR platform. Other ITSM systems (ServiceNow) can easily be integrated using Certified Content Collections.
 
-The publisher component of the solution can readably be extended to other controller managed Cisco networks (ACI, DNAC) as well as traditional route / switch networks. Using Ansible playbooks and Content Collections, additional sinks of data can include visibility, logging and management systems. 
+The publisher component of the solution can readably be extended to other controller-managed Cisco networks (ACI, DNAC) and traditional route/switch networks. Using Ansible playbooks and Content Collections, additional data sinks can include visibility, logging, and management systems. 
 
 **How does your idea relate to the use case(s) you selected above?**
 
-The solution adopts service-oriented approach to the publishing and consumption of network telemetry data. While the solution can be extended to Cisco networking (routers, switches, firewalls), the implementation leverages the Meraki API to publish clients observed on a Meraki network (and network uplink statistics) to a Kafka event streaming service. Utilizing Event-Driven Ansible, the telemetry is consumed for auditing, alerting and remediation by IT management systems and SOAR implementations.
+The solution adopts a service-oriented approach to the publishing and consumption of network telemetry data. While the solution can be extended to Cisco networking (routers, switches, firewalls), the implementation leverages the Meraki API to publish clients observed on a Meraki network (and network uplink statistics) to a Kafka event streaming service. Utilizing Event-Driven Ansible, IT management systems, and SOAR implementations consume the telemetry for auditing, alerting, and remediation.
 
 ## Notes
 
