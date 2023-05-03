@@ -122,4 +122,26 @@ https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
 
 ## Splunk SOAR
 
+Installation instructions for Splunk SOAR 
+
 https://docs.splunk.com/Documentation/SOARonprem/6.0.0/Install/InstallAMI
+
+Refer to https://github.com/joelwking/csna_/blob/main/DEVELOPMENT_NOTES.md  **HOWEVER** these instructions may be OUT OF DATE!
+
+The version installed is `version 6.0.0.114895`.
+
+Following launching of the instance, create a security group and apply to the instance
+
+Allow SSH and HTTPS, HTTP and TCP port 9999 from your source IP address (or include your team's IP address.)
+
+You should be able to connect to the instance via SSH using the key-pair assigned at launch
+
+```
+ssh -i ~/.ssh/id_ed25519 phantom@52.3.242.131
+```
+>Note: In order to log in to the operating system of your AMI-based installation using SSH, use the user id `phantom`. If you need root access, use `sudo su -`.
+
+<https://docs.splunk.com/Documentation/SOARonprem/latest/Install/Login>
+Login to the web UI using `soar_local_admin` and the instance ID `i-04647a8ebf382b26a`
+
+Change the password of the `soar_local_admin` account. Get the API key from the `automation` userid.

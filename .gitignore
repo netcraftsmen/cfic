@@ -5,3 +5,7 @@ playbooks/artifacts
 # Do not push private OPENSSH keys
 #
 playbooks/files/*.cer
+#
+# Do not push cache
+#
+collections/ansible_collections/netcraftsmen/kafka/plugins/module_utils/__pycache__/

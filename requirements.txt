@@ -13,3 +13,5 @@ ansible-rulebook
 # watchdog
 # systemd-python
 # dpath
+#
+requests
