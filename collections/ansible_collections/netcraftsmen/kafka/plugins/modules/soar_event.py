@@ -178,8 +178,7 @@ def main():
         if not isinstance(container_result, dict):
             module.fail_json(msg=f'{container_result}')
         container_id = container_result.get('container_id')
-
-    result.update(container_result)
+        result.update(container_result)
 
     cef = module.params.get('cef')
     metadata = module.params.get('metadata')
