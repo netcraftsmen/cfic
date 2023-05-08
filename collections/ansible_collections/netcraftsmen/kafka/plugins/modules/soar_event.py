@@ -110,8 +110,7 @@ EXAMPLES = '''
 from ansible.module_utils.basic import AnsibleModule
 
 try:
-    # import PhantomIngest as ingest
-    from ansible_collections.netcraftsmen.kafka.plugins.module_utils.PhantomIngest import PhantomIngest as ingest
+    from ansible_collections.netcraftsmen.kafka.plugins.module_utils import PhantomIngest as ingest
     HAS_INGEST = True
 except ImportError:
     HAS_INGEST = False
@@ -177,7 +176,7 @@ def main():
     if container:
         container_result = create_container(p, container)
         if not isinstance(container_result, dict):
-            module.fail_json(msg=f'container_result')
+            module.fail_json(msg=f'{container_result}')
 
     result.update(container_result)
 
