@@ -8,7 +8,7 @@ ANSIBLE_METADATA = {
 }
 DOCUMENTATION = '''
 ---
-module: cucm.admin
+module: kafka.soar_event.py
 
 short_description: Create Splunk SOAR events
 version_added: "2.14.5"
@@ -105,7 +105,6 @@ EXAMPLES = '''
           sourceMacAddress: “00:0D:60:AF:1B:61”
           msg: "An arbitrary message giving more details about the event."
           
-
 '''
 from ansible.module_utils.basic import AnsibleModule
 
@@ -179,6 +178,8 @@ def main():
             module.fail_json(msg=f'{container_result}')
         container_id = container_result.get('container_id')
         result.update(container_result)
+    else:
+        result.update(dict(container_id=container_id))
 
     cef = module.params.get('cef')
     metadata = module.params.get('metadata')
