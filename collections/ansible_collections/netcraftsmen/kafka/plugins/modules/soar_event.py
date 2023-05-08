@@ -29,7 +29,38 @@ options:
       required: true
       type: str
 
-    TODO
+    container_id:
+      description:
+        - An existing container to add the artifact.
+      required: false
+      type: int
+  
+    container:
+      description:
+        - Key, Value pairs describing fields used to describe the container, see the
+        - examples for suggested keys and sample values
+      required: false
+      type: dict
+    
+    artifact:
+      description:
+        - Key, Value pairs describing the files used to describe the artifact, see the
+        - examples for suggested keys and sample values
+      required: false
+      type: dict
+
+    cef:
+      description:
+        - The Common Event Format (CEF) is a standardized logging format developed by ArcSight
+        - Search for 'ArcSight Common Event Format (CEF)' to locate the Key, Value schema.
+      required: false
+      type: dict
+
+    metadata:
+       description:
+         - Additional meta data to add to the artifact, it is free form Key, Value pairs
+       required: false
+       type: dict
 
 author:
     - Joel W. King (@joelwking)
@@ -40,13 +71,19 @@ EXAMPLES = '''
       netcraftsmen.kafka.soar_event:
         server: ec2-54-164-159-148.compute-1.amazonaws.com
         authtoken: "1GvdkA220zFlbJMjISredactedm9QANjCg0k="
-        # container_id: 3
         container:
-          name: "Voltaire" 
-          description: "French Enlightenment writer, historian, and philosopher."
+          name: "A short friendly name for the container" 
+          description: "A brief useful description of the behavior tracked by this container"
+          label: events
+          sensitivity: red
+          severity: high
+          tags: ['danger']
         artifact:
           name: "cfic"
           source_data_identifier: "IR_3458575"
+          tags: ['atomic_counters']
+          type: "network"
+          label: "event"
         cef:
           sourceAddress: 192.0.2.1
           sourcePort: 6553 
@@ -73,18 +110,27 @@ EXAMPLES = '''
 from ansible.module_utils.basic import AnsibleModule
 
 try:
-    from PhantomIngest import ingest
+    import PhantomIngest as ingest
     HAS_INGEST = True
 except ImportError:
     HAS_INGEST = False
 
-def container():
+def create_container(_object, container):
     """
-      TODO, for now, assume we have an existing container.
+        Input is a dictionary that defines the name, description, etc.
+        Returns a tuple of the container_id (int) and status_code (int) 
+        or a text (str) indicating the error
     """
-    return
+    try:
+        container_id = _object.add_container(**container)
+    except AssertionError as e:
+        return f"Any HTTP return code other than OK {e}"
+    except Exception as e:
+        return f"Typically the host did not respond, a connection error {e}"
 
-def artifact(_object, container_id, cef, metadata, artifact):
+    return dict(container_id=container_id, status_code=_object.status_code)
+
+def add_artifact(_object, container_id, cef, metadata, _artifact):
     """
       Add the artifact to the container (event)
     """
@@ -117,26 +163,33 @@ def main():
     container_id = module.params.get('container_id')
     container = module.params.get('container')
 
+    result = dict(changed=False)   # Create a variable to store output
+
     if container and container_id:
        module.fail_json(msg="Specify either container ID or container, not both.")
 
     try:
-        p = ingest.PhantomIngest(f"https://{server}", f"{authtoken}")
+        p = ingest.PhantomIngest(f"{server}", f"{authtoken}")
     except Exception as e:
         module.fail_json(msg=f'Exception: {e}')
 
     if container:
-        container_id = container(container)  # TODO Create container if not specified.
-    
+        container_result = create_container(p, container)
+        if not isinstance(container_result, dict):
+            module.fail_json(msg=f'container_result')
+
+    result.update(container_result)
+
     cef = module.params.get('cef')
     metadata = module.params.get('metadata')
     artifact = module.params.get('artifact')
 
-    result = artifact(artifact(p, container_id, cef, metadata, artifact))
-    result['changed'] = False
-    if result.get('status_code') in (200,):  # TODO is string or integer?
+    artifact_result = add_artifact(p, container_id, cef, metadata, artifact)
+    
+    if artifact_result.get('status_code') in (200,):
         result['changed'] = True
 
+    result.update(artifact_result)
     module.exit_json(**result)
 
 
