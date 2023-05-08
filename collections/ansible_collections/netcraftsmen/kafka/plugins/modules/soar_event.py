@@ -189,6 +189,8 @@ def main():
     
     if artifact_result.get('status_code') in (200,):
         result['changed'] = True
+    else:
+        module.fail_json(msg=f'{artifact_result}')
 
     result.update(artifact_result)
     module.exit_json(**result)
