@@ -21,7 +21,7 @@
     server: "ec2-54-144-142-30.compute-1.amazonaws.com"
     container_id: 3
   tasks:
-    - name: Create Container and Artifact
+    - name: Create Artifact using existing container
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
         authtoken: '{{ authtoken }}'
