@@ -147,7 +147,7 @@ def main():
             server=dict(required=True),
             authtoken=dict(required=True, no_log=True),
             container_id=dict(required=False),
-            container=dict(required=False, type=dict, default=dict())
+            container=dict(required=False, type=dict, default=dict()),
             artifact=dict(required=False, type=dict, default=dict(name='default')),
             cef=dict(required=False, type='dict', default=dict()),
             metadata=dict(required=False, type='dict', default=dict()),

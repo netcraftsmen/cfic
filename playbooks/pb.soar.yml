@@ -12,11 +12,12 @@
 #
 - name: Filter Events from Kafka
   hosts: localhost
+  connection: local
   gather_facts: no
 
   vars:
     # input: '{{ ansible_eda.event.payload }}'
-    authtoken: "{{ ansible.builtin_lookup('ansible.builtin.env', 'AUTHTOKEN') }}"
+    authtoken: "{{ lookup('ansible.builtin.env', 'AUTHTOKEN') }}"
     server: "ec2-54-144-142-30.compute-1.amazonaws.com"
 
   tasks:
