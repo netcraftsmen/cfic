@@ -124,7 +124,7 @@ def create_container(_object, container):
     try:
         container_id = _object.add_container(**container)
     except AssertionError as e:
-        return f"Any HTTP return code other than OK {e}"
+        return f"Any HTTP return code other than OK {e} input: {container}"
     except Exception as e:
         return f"Typically the host did not respond, a connection error {e}"
 
@@ -135,9 +135,9 @@ def add_artifact(_object, container_id, cef, metadata, _artifact):
       Add the artifact to the container (event)
     """
     try:
-        artifact_id = _object.add_artifact(container_id, cef, metadata, **artifact)
+        artifact_id = _object.add_artifact(container_id, cef, metadata, **_artifact)
     except:
-        return dict(status_code=500)
+        return dict(status_code=500, msg=f'input: {_artifact}')
     
     return dict(artifact_id=artifact_id, status_code=_object.status_code)
 
@@ -175,6 +175,7 @@ def main():
 
     if container:
         container_result = create_container(p, container)
+        container_id = container_result.get('container_id')
         if not isinstance(container_result, dict):
             module.fail_json(msg=f'{container_result}')
 
