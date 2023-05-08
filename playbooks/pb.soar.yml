@@ -16,12 +16,14 @@
 
   vars:
     # input: '{{ ansible_eda.event.payload }}'
+    authtoken: "{{ ansible.builtin_lookup('ansible.builtin.env', 'AUTHTOKEN') }}"
+    server: "ec2-54-144-142-30.compute-1.amazonaws.com"
 
   tasks:
     - name: Create Container and Artifact
       netcraftsmen.kafka.soar_event:
-        server: ec2-54-164-159-148.compute-1.amazonaws.com
-        authtoken: "1GvdkA220zFlbJMjISredactedm9QANjCg0k="
+        server: '{{ server }}'
+        authtoken: '{{ authtoken }}'
         container:
           name: "cfic_demo" 
           description: "A brief useful description of the behavior tracked by this container"
