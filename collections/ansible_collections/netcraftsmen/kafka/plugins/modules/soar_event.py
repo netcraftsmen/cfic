@@ -93,7 +93,7 @@ EXAMPLES = '''
           Born: "November 21, 1694"
           quote: "Judge of a man by his questions rather than by his answers."
 
-    - name: Add artifact to new container
+    - name: Add artifact to an existing container
       netcraftsmen.kafka.soar_event:
         server: ec2-54-164-159-148.compute-1.amazonaws.com
         authtoken: "1GvdkA220zFlbJMjISredactedm9QANjCg0k="

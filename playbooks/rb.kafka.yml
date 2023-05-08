@@ -34,4 +34,4 @@
         #  var:  event.payload
 
         run_playbook:
-          name: pb.soar.yml
+          name: pb.debug.yml

@@ -15,10 +15,28 @@
   gather_facts: no
 
   vars:
-    input: '{{ ansible_eda.event.payload }}'
+    # input: '{{ ansible_eda.event.payload }}'
 
   tasks:
-    - name: loop through the event
-      ansible.builtin.debug:
-         var: item.id
-      loop: '{{ ansible_eda.event.payload }}'
+    - name: Create Container and Artifact
+      netcraftsmen.kafka.soar_event:
+        server: ec2-54-164-159-148.compute-1.amazonaws.com
+        authtoken: "1GvdkA220zFlbJMjISredactedm9QANjCg0k="
+        container:
+          name: "cfic_demo" 
+          description: "A brief useful description of the behavior tracked by this container"
+          label: events
+          sensitivity: red
+          severity: medimum
+          tags: ['unauthorized_mac']
+        artifact:
+          name: "cfic_demo_artifact"
+          source_data_identifier: "IR_3458575"
+          tags: ['spouse_and_child']
+          type: "network"
+          label: "mac_event"
+        cef:
+          deviceMacAddress: “00:0D:60:AF:1B:61”
+          sourceUserId: "robert@example.net"
+          message: "Event-Driven Ansible"
+        metadata: {}
