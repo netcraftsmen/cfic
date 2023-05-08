@@ -110,7 +110,8 @@ EXAMPLES = '''
 from ansible.module_utils.basic import AnsibleModule
 
 try:
-    import PhantomIngest as ingest
+    # import PhantomIngest as ingest
+    from ansible_collections.netcraftsmen.kafka.plugins.module_utils.PhantomIngest import PhantomIngest as ingest
     HAS_INGEST = True
 except ImportError:
     HAS_INGEST = False
