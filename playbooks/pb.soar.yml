@@ -26,7 +26,7 @@
     - name:
       ansible.builtin.debug:
         msg:
-         - '{{ bar }} {{ networkName }}'
+         - '{{ networkName }}'
            # - '{{ ansible_eda.event }}'
 
     - name: Create Container
@@ -34,12 +34,12 @@
         server: '{{ server }}'
         authtoken: '{{ authtoken }}'
         container:
-          name: "cfic_demo" 
-          description: "A brief useful description of the behavior tracked by this container"
+          name: '{{ ansible_eda.event.networkName }}'
+          description: "{{ ansible_eda.event.organizationId }}"
           label: events
           sensitivity: red
           severity: medium
-          tags: ['unauthorized_mac']
+          tags: ['network_clients']
       register: result
 
     - name: Create Artifacts
@@ -49,7 +49,7 @@
         container_id: '{{ result.container_id }}'
         artifact:
           name: 'item.id'
-          source_data_identifier: '{{ item.networkName }}'
+          source_data_identifier: '{{ item.id }}'
           tags: ['{{ item.status }}']
           type: "network"
           label: "network_clients"
