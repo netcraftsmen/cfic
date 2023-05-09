@@ -45,6 +45,5 @@
           name: pb.soar.yml
           delay: 1                          # optional, in seconds
           extra_vars:
-            networkName: event.networkName
-            bar: BAR
+            networkName: BAR    
           verbosity: 1

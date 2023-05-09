@@ -20,8 +20,7 @@
     authtoken: "{{ lookup('ansible.builtin.env', 'SOAR_AUTHTOKEN') }}"
     server: "{{ lookup('ansible.builtin.env', 'SOAR_SERVER') }}"
     # extra_vars
-    networkName: 'UNKNOWN'
-    bar: 'foo'
+    networkName: foo
 
   tasks:
     - name:
@@ -47,15 +46,20 @@
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
         authtoken: '{{ authtoken }}'
-        container_id: '{{ result.containter_id }}'
+        container_id: '{{ result.container_id }}'
         artifact:
-          name: "cfic_demo_artifact"
-          source_data_identifier: '{{ ansible_eda.event.networkName }}'
-          tags: ['spouse_and_child']
+          name: 'item.id'
+          source_data_identifier: '{{ item.networkName }}'
+          tags: ['{{ item.status }}']
           type: "network"
-          label: "mac_event"
+          label: "network_clients"
         cef:
-          deviceMacAddress: “00:0D:60:AF:1B:61”
-          sourceUserId: "robert@example.net"
-          message: "Event-Driven Ansible"
+          deviceMacAddress: “{{ item.mac }}”
+          deviceAddress: "{{ item.ip }}"
+          sourceUserId: "{{ item.user }}"
+          c6a1: "{{ item.ip6Local }}"
+          c6a1Label: 'IPv6Local'
+          DeviceVendor: '{{ item.manufacturer }}'
+          message: "{{ item.description | default(omit) }}"
         metadata: {}
+      loop: '{{ ansible_eda.event.payload }}'
