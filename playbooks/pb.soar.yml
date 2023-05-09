@@ -51,7 +51,7 @@
           name: '{{ item.id }}'
           description: '{{ item.description }}'
           source_data_identifier: '{{ item.id }}'
-          tags: ['{{ item.status }}']
+          tags: ['{{ item.status }}', '{{ item.recentDeviceConnection }}', '{{ item.ssid }}']
           type: "network"
           label: "network_clients"
         cef:

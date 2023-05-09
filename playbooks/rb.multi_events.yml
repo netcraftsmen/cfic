@@ -8,8 +8,7 @@
 #
 #      Usage: 
 #             export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
-#             ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
-#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
+#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
 - name: Kafka consumer for Meraki clients publisked in Kafka
   hosts: all
 
@@ -26,12 +25,17 @@
         offset: "{{ OFFSET }}"              # latest
 
   rules:
-    - name: match on everything for now
-      condition: event.payload is defined
-      action:
-        run_playbook:     
-          name: pb.soar.yml
-          delay: 1                          # optional, in seconds
-          extra_vars:
-            networkName: BAR    
-          verbosity: 1
+    - name: example of matching on a specific value(s)
+      enabled: true                         # enabled for testing
+      condition:
+        any:                                # or `all`
+          - event.networkName == "SWISSWOOD"
+          - event.network is search("L_", ignorecase=true)
+      actions:                              # multiple actions
+        - debug:
+            var: events.m_0.payload
+        - print_event:
+            pretty: true
+
+   # Refer topic:
+   #   https://ansible-rulebook.readthedocs.io/en/stable/multi_events.html

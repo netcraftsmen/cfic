@@ -126,13 +126,67 @@ You can test your event_source by running from a python interpreter.
 
 ~/cfic/cfic/collections/ansible_collections/netcraftsmen/kafka/plugins/event_source# python3 consumer.py
 
-## Ansible Config file
+## Environment variables
+
+### Meraki Dashboard
+
+The semaphore program requires the Meraki dashboard API key and a timer configured
+
+```shell
+export MERAKI_DASHBOARD_API_KEY=1c6fc04dd872a2redacted10275f5aaa17d34a
+export MERAKI_TIMESPAN=43200
+```
+
+### Kafka Cluster
+
+Both the publisher and consumer (client) require several environment variables
+
+```bash
+export BOOTSTRAP_SERVER=pkc-n00kk.us-east-1.aws.confluent.cloud:9092
+IFS=':'    # Set colon as delimiter
+read -a cluster <<< "$BOOTSTRAP_SERVER"
+export CLUSTER_HOST=${cluster[0]}
+export CLUSTER_PORT=${cluster[1]}
+
+export CLUSTER_API_SECRET=KTI3pZBFYs4Xp91WuFSY3yrKDredactedkmS7fCeZPzO/6IR9B3RU
+export CLUSTER_API_KEY=UV3UB3YBIMAGAYIQR4J
+
+export TOPIC=cfic_0
+export OFFSET=latest
+export GROUP=semaphore_1
+```
+### Splunk SOAR
+
+Auth Token for Phantom (Splunk SOAR)  configure this under the user configuration screen for user `automation`
+
+{ "ph-auth-token": "1GvdkA220zFlbJMjIredactedRXmhmm9QANjCg0k=","server": "https://54.144.142.30" }
+
+```shell
+export SOAR_AUTHTOKEN="1GvdkA220zFlbJMjISwCl9NredactedXmhmm9QANjCg0k="
+export SOAR_SERVER=ec2-54-144-142-30.compute-1.amazonaws.com
+```
+
+### Ansible Config file
 
 You need to set the ENV variable for ansible-rulebook to locate the configuration file.
+
+https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file
 
 export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
 
 >Note: do not use relative paths
+
+>NOTE Test using a symbolic link
+
+from the home directory `ln -s  /root/cfic/cfic/playbooks/ansible.cfg .ansible.cfg`
+
+## Running a rulebook 
+
+example of running the rulebook
+
+```shell
+ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
+```
 
 ## Splunk SOAR
 

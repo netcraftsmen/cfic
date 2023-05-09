@@ -8,9 +8,8 @@
 #
 #      Usage: 
 #             export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
-#             ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
-#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
-- name: Kafka consumer for Meraki clients publisked in Kafka
+#             ansible-rulebook -r rb.pretty.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
+- name: Kafka consumer, pretty print the event (for debugging)
   hosts: all
 
   sources:
@@ -26,12 +25,9 @@
         offset: "{{ OFFSET }}"              # latest
 
   rules:
-    - name: match on everything for now
+    - name: example of matching on a specific value(s)
+      enabled: true                         # enabled for testing
       condition: event.payload is defined
-      action:
-        run_playbook:     
-          name: pb.soar.yml
-          delay: 1                          # optional, in seconds
-          extra_vars:
-            networkName: BAR    
-          verbosity: 1
+      actions:
+        - print_event:
+            pretty: true
