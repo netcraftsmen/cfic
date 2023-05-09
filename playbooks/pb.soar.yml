@@ -35,7 +35,7 @@
         authtoken: '{{ authtoken }}'
         container:
           name: '{{ ansible_eda.event.networkName }}'
-          description: "{{ ansible_eda.event.organizationId }}"
+          description: "{{ ansible_eda.event.network }}"
           label: events
           sensitivity: red
           severity: medium
@@ -48,7 +48,8 @@
         authtoken: '{{ authtoken }}'
         container_id: '{{ result.container_id }}'
         artifact:
-          name: 'item.id'
+          name: '{{ item.id }}'
+          description: '{{ item.description }}'
           source_data_identifier: '{{ item.id }}'
           tags: ['{{ item.status }}']
           type: "network"
