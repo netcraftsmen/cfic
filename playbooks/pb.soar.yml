@@ -8,9 +8,10 @@
 #
 #      Usage:  <called from Event-Driven Ansible>
 #
-#      This playbook processes and filters events from Kafka  . . .
+#      This playbook processes Kafka events from Event-Driven Ansible, creating artifacts
+#      in the Splunk SOAR platform
 #
-- name: Filter Events from Kafka
+- name: Create an artifacts in Splunk SOAR
   hosts: localhost
   connection: local
   gather_facts: no
