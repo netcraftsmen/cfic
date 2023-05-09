@@ -120,11 +120,19 @@ https://kafkatool.com/download.html
 https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
 
 
-## Testing an event source outside of a runbook
+## Testing an event source outside of a rulebook
 
 You can test your event_source by running from a python interpreter.
 
 ~/cfic/cfic/collections/ansible_collections/netcraftsmen/kafka/plugins/event_source# python3 consumer.py
+
+## Ansible Config file
+
+You need to set the ENV variable for ansible-rulebook to locate the configuration file.
+
+export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
+
+>Note: do not use relative paths
 
 ## Splunk SOAR
 

@@ -17,12 +17,20 @@
   gather_facts: no
 
   vars:
-    # input: '{{ ansible_eda.event.payload }}'
-    authtoken: "{{ lookup('ansible.builtin.env', 'AUTHTOKEN') }}"
-    server: "ec2-54-144-142-30.compute-1.amazonaws.com"
+    authtoken: "{{ lookup('ansible.builtin.env', 'SOAR_AUTHTOKEN') }}"
+    server: "{{ lookup('ansible.builtin.env', 'SOAR_SERVER') }}"
+    # extra_vars
+    networkName: 'UNKNOWN'
+    bar: 'foo'
 
   tasks:
-    - name: Create Container and Artifact
+    - name:
+      ansible.builtin.debug:
+        msg:
+         - '{{ bar }} {{ networkName }}'
+           # - '{{ ansible_eda.event }}'
+
+    - name: Create Container
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
         authtoken: '{{ authtoken }}'
@@ -33,9 +41,16 @@
           sensitivity: red
           severity: medium
           tags: ['unauthorized_mac']
+      register: result
+
+    - name: Create Artifacts
+      netcraftsmen.kafka.soar_event:
+        server: '{{ server }}'
+        authtoken: '{{ authtoken }}'
+        container_id: '{{ result.containter_id }}'
         artifact:
           name: "cfic_demo_artifact"
-          source_data_identifier: "IR_3458575"
+          source_data_identifier: '{{ ansible_eda.event.networkName }}'
           tags: ['spouse_and_child']
           type: "network"
           label: "mac_event"

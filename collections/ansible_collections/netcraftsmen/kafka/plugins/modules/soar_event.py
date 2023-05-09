@@ -184,6 +184,7 @@ def main():
             module.fail_json(msg=f'{container_result}')
         container_id = container_result.get('container_id')
         result.update(container_result)
+        result['changed'] = True
     else:
         result.update(dict(container_id=container_id))
 
@@ -191,14 +192,15 @@ def main():
     metadata = module.params.get('metadata')
     artifact = module.params.get('artifact')
 
-    artifact_result = add_artifact(p, container_id, cef, metadata, artifact)
+    if artifact:
+        artifact_result = add_artifact(p, container_id, cef, metadata, artifact)
     
-    if artifact_result.get('status_code') in (200,):
-        result['changed'] = True
-    else:
-        module.fail_json(msg=f'{artifact_result}')
+        if artifact_result.get('status_code') in (200,):
+            result.update(artifact_result)
+            result['changed'] = True
+        else:
+            module.fail_json(msg=f'{artifact_result}')
 
-    result.update(artifact_result)
     module.exit_json(**result)
 
 

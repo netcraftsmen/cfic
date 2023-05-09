@@ -6,9 +6,10 @@
 #
 #      Author: @joelwking
 #
-#      Usage: ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
-#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,CLUSTER_HOST,CLUSTER_PORT
-#
+#      Usage: 
+#             export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
+#             ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
+#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
 - name: Kafka consumer for Meraki clients publisked in Kafka
   hosts: all
 
@@ -25,23 +26,25 @@
         offset: "{{ OFFSET }}"              # latest
 
   rules:
-    - name: match on everything for now
-      condition:  
-        any:
-          - event.payload is defined
+    - name: example of matching on a specific value(s)
+      enabled: true                         # enabled for testing
+      condition:
+        all:                                # or `any`
           - event.networkName == "SWISSWOOD"
+          - event.network is search("L_", ignorecase=true)
+      actions:                              # multiple actions
+        - debug:
+            var: event.payload
+        - print_event:
+            pretty: true
+
+    - name: match on everything for now
+      condition: event.payload is defined
       action:
         run_playbook:     
           name: pb.soar.yml
           delay: 1                          # optional, in seconds
-          extra_vars: 
+          extra_vars:
+            networkName: event.networkName
+            bar: BAR
           verbosity: 1
-
-    - name: example of matching on a specific value(s)
-      condition:
-        all:
-          - event.networkName == "SWISSWOOD"
-          - event.network == "L_629378047925028460"
-      action:
-        debug:
-          var: event.payload
