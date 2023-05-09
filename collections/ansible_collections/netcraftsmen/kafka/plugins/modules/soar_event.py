@@ -19,40 +19,43 @@ description:
 options:
     authtoken:
       description:
-        - The API Bearer Token, "ph-auth-token" for the 'automation' user
+        - The API Bearer Token, "ph-auth-token" for the 'automation' user.
       required: true
       type: str
 
     server:
       description:
-        - The host IP or FQDN of the Splunk SOAR instance
+        - The host IP or FQDN of the Splunk SOAR instance.
       required: true
       type: str
 
     container_id:
       description:
-        - An existing container to add the artifact.
+        - An existing container to add the artifact. Container IDs are shown on the
+        - web GUI
       required: false
       type: int
   
     container:
       description:
         - Key, Value pairs describing fields used to describe the container, see the
-        - examples for suggested keys and sample values
+        - examples for suggested keys and sample values. Using the web GUI, containers (events)
+        - can be saved as JSON, the resulting file shows the keyword names that can be specified.
       required: false
       type: dict
     
     artifact:
       description:
         - Key, Value pairs describing the files used to describe the artifact, see the
-        - examples for suggested keys and sample values
+        - examples for suggested keys and sample values. By viewing an existing artifact in the
+        - web GUI as JSON, the valid keyword names are identified. 
       required: false
       type: dict
 
     cef:
       description:
         - The Common Event Format (CEF) is a standardized logging format developed by ArcSight
-        - Search for 'ArcSight Common Event Format (CEF)' to locate the Key, Value schema.
+        - Search for 'ArcSight Common Event Format (CEF)' to locate the Key, Value schema
       required: false
       type: dict
 
@@ -131,13 +134,16 @@ def create_container(_object, container):
 
 def add_artifact(_object, container_id, cef, metadata, _artifact):
     """
-      Add the artifact to the container (event)
+      Add the artifact to the container (event) 
+      In addition to the object, the container_id (artifacts are associated with an existing
+      container), any CEF and metadata, and the artifact fields are specified.
     """
     try:
         artifact_id = _object.add_artifact(container_id, cef, metadata, **_artifact)
+    except ConnectionError:
+        return dict(status_code=504, msg=f'Server timeout')
     except:
         return dict(status_code=500, msg=f'input: {_artifact}')
-    
     return dict(artifact_id=artifact_id, status_code=_object.status_code)
 
 def main():
@@ -147,7 +153,7 @@ def main():
             authtoken=dict(required=True, no_log=True),
             container_id=dict(required=False, type='int'),
             container=dict(required=False, type='dict', default=dict()),
-            artifact=dict(required=False, type='dict', default=dict(name='default')),
+            artifact=dict(required=False, type='dict', default=dict()),
             cef=dict(required=False, type='dict', default=dict()),
             metadata=dict(required=False, type='dict', default=dict()),
         ),

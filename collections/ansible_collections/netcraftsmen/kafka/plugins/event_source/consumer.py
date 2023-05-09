@@ -57,10 +57,10 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         )
         context.check_hostname = check_hostname
 
-    ### BEGIN HACK
+    ### BEGIN HACK @joelwking
     context = create_ssl_context()
     context.check_hostname = check_hostname
-    ### END HACK
+    ### END HACK @joelwking
     kafka_consumer = AIOKafkaConsumer(
         topic,
         bootstrap_servers="{0}:{1}".format(host, port),
@@ -68,9 +68,9 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
         enable_auto_commit=True,
         max_poll_records=1,
         auto_offset_reset=offset,
-        # security_protocol="SSL" if cafile else "PLAINTEXT",
-        # ssl_context=context if cafile else None,
-        ssl_context=context,
+        # security_protocol="SSL" if cafile else "PLAINTEXT",  BEGIN HACK @joelwking
+        # ssl_context=context if cafile else None,       
+        ssl_context=context,                                 # END HACK @joelwking
         security_protocol='SASL_SSL',
         sasl_mechanism='PLAIN',
         sasl_plain_password=password,
@@ -104,7 +104,7 @@ if __name__ == "__main__":
                 certfile=None,
                 keyfile=None,
                 check_hostname=False,
-                offset="latest"
+                offset=os.environ.get('OFFSET', 'latest')
                 )
 
     class MockQueue:

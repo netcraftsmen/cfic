@@ -7,8 +7,7 @@
 #      Author: @joelwking
 #
 #      Usage: ansible-rulebook --rulebook rb.kafka.yml -i inventory.yml  -v
-#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v \
-#             --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC
+#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC
 - name: Kafka consumer for Meraki clients
   hosts: all
 

@@ -120,6 +120,12 @@ https://kafkatool.com/download.html
 https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
 
 
+## Testing an event source outside of a runbook
+
+You can test your event_source by running from a python interpreter.
+
+~/cfic/cfic/collections/ansible_collections/netcraftsmen/kafka/plugins/event_source# python3 consumer.py
+
 ## Splunk SOAR
 
 Installation instructions for Splunk SOAR 
