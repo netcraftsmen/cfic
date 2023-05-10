@@ -8,7 +8,7 @@
 #
 #      Usage: 
 #             export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
-#             ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
+#             ansible-rulebook -r rb.multi_events.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
 - name: Kafka consumer for Meraki clients publisked in Kafka
   hosts: all
 

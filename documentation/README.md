@@ -11,63 +11,127 @@ Useful references for Event Driven Ansible
 
 Installation documentation when installing on Digital Ocean 
 
+Create a SSH key for the Droplet
+
+```shell
+cd ~/.ssh
+ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/Users/joelking/.ssh/id_rsa): droplet_cfic
+```
+
+Create a Droplet
+
 ubuntu-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
 
+and provide the ssh key during the setup.
+
+SSH to the Droplet
+
+
+ssh root@137.184.215.79 -i ~/.ssh/droplet_cfic
+
 ```
+
+Make a directory to house the installation
+
+```shell
+mkdir cfic
+cd cfic
+```
+
+
+Install software
+
+```shell
+sudo apt update
+sudo apt-get upgrade
+sudo apt install git
+sudo apt install python3-pip
+sudo apt install python3.8-venv
+sudo apt install pkgconf
+sudo apt install build-essential
+sudo apt install libsystemd-dev
+pip3 install --upgrade pip
+```
+
+Create a virtual environment
+
+```shell
+python3 -m venv eda
+source eda/bin/activate
+```
+
+Download the JAVA package
+
 # https://www.oracle.com/java/technologies/downloads/
 # https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts
-#
-# wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
-#
-# Installing on Digital Ocean Droplet
-#     1  sudo apt update
-#     2  apt install git
-#     3  python --version
-#     4  python
-#     5  which python
-#     6  apt install python3-pip
-#     7  apt install wget
-#     8  pip3 install --upgrade pip
-#     9  apt install default-jdk
-#    10  which python
-#    11  apt install python3.8
-#    12  which python
-#    13  python3.8
-#    14  java --version
-#  https://www.oracle.com/java/technologies/downloads/#java20
-#    15  wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
-#    16  ls
-#    17  sudo apt-get -qqy install ./jdk-20_linux-x64_bin.deb
-#    18  ls /usr/lib/jvm
-#    19  sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-20/bin/java 2020
-#    20  java --version
-#    21  history
-#
-# java --version
-# java 20.0.1 2023-04-18
-# Java(TM) SE Runtime Environment (build 20.0.1+9-29)
-# Java HotSpot(TM) 64-Bit Server VM (build 20.0.1+9-29, mixed mode, sharing)
 
-#    28  pip install testresources
-#    29  pip install ansible-rulebook
-#    30  ansible-rulebook --version
-#    31  ansible collection install ansible.eda
-#    32  ansible-galaxy collection install ansible.eda
+```shell
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
+sudo apt-get -qqy install ./jdk-20_linux-x64_bin.deb
+ls /usr/lib/jvm
+sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-20/bin/java 2020
+```
+Verify the version of JAVA
 
-# https://raw.githubusercontent.com/ansible/event-driven-ansible/main/requirements.txt
-# pip install -r requirements.txt
+```shell
+java --version
+java 20.0.1 2023-04-18
+Java(TM) SE Runtime Environment (build 20.0.1+9-29)
+Java HotSpot(TM) 64-Bit Server VM (build 20.0.1+9-29, mixed mode, sharing)
+root@cfic-s-2vcpu-2gb-nyc1-01:~/cfic#
+```
 
-# pip install importlib-resources
 
-### Success!
 
-# root@ubuntu-s-2vcpu-2gb-nyc1-01:~# ansible-rulebook --version
-# __version__ = '0.13.0'
-#   Executable location = /usr/local/bin/ansible-rulebook
-#   Drools_jpy version = 0.3.1
-#   Java home = /usr/lib/jvm/jdk-20
-#   Java version = 20.0.1
-#   Python version = 3.8.10 (default, Mar 13 2023, 10:26:41) [GCC 9.4.0]
+Install Ansible rulebook
+
+```shell
+pip install testresources
+pip install ansible
+```
+
+https://raw.githubusercontent.com/ansible/event-driven-ansible/main/requirements.txt
+Create requirements.txt with these entries:
+
+```
+azure-servicebus
+aiobotocore
+aiohttp
+aiokafka
+watchdog
+systemd-python
+dpath
+requests
+importlib-resources
+```
+
+export PKG_CONFIG_PATH
+
+pip install -r requirements.txt
+
+
+pip install ansible-rulebook
+
+
+```shell
+ansible-rulebook --version
+__version__ = '0.13.0'
+  Executable location = /usr/local/bin/ansible-rulebook
+  Drools_jpy version = 0.3.1
+  Java home = /usr/lib/jvm/jdk-20
+  Java version = 20.0.1
+  Python version = 3.8.10 (default, Mar 13 2023, 10:26:41) [GCC 9.4.0]
+```
+
+Install the Event-Drive Ansible collection
+
+```shell
+ansible-galaxy collection install ansible.eda
+```
+
+
 
 ```
 
@@ -77,41 +141,91 @@ Using these instructions, installed Docker to run Kafka in a container
 
 <https://docs.docker.com/engine/install/ubuntu/>
 
-Following the installation, shut the Droplet and created a snapshot
+### install docker
+
+```shell
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo docker run hello-world
+```
+
+### Clone the repository
+
+Create a personal access token in GitHub and then clone the repository
+
+git clone https://<personal_access_token_here>@github.com/netcraftsmen/cfic.git
+
+### Clone Semaphore
+
+It is public, so there is no need for the personal access token
+
+git clone https://github.com/netcraftsmen/semaphore.git
 
 
-## Create Kafka Broker
+### Create a snapshot of the Droplet
 
-https://developer.confluent.io/quickstart/kafka-docker/
+shut the Droplet and created a snapshot
 
+Log back in
 
-### Create the docker-compose.yml
+```shell
+cd cfic
+source eda/bin/activate
+```
 
-### Start the containers
+Start up the publisher
 
-docker compose up -d
+```shell
+cd ~/cfic/semaphore/
+pip install -r requirements.txt
+```
 
-### Create a topic
+```shell
+cd ~/cfic/semaphore/library
+```
 
-docker exec broker \
-kafka-topics --bootstrap-server broker:9092 \
-             --create \
-             --topic cfic_0
+### Meraki Dashboard
 
+The semaphore program requires the Meraki dashboard API key and a timer configured
 
+```shell
+export MERAKI_DASHBOARD_API_KEY=1c6fc04dd872a2redacted10275f5aaa17d34a
+export MERAKI_TIMESPAN=43200
+```
+It also needs the Confluent Cloud variables
 
+```bash
+export BOOTSTRAP_SERVER=pkc-n00kk.us-east-1.aws.confluent.cloud:9092
+IFS=':'    # Set colon as delimiter
+read -a cluster <<< "$BOOTSTRAP_SERVER"
+export CLUSTER_HOST=${cluster[0]}
+export CLUSTER_PORT=${cluster[1]}
 
+export CLUSTER_API_SECRET=KTI3pZBFYs4Xp91WuFSY3yrKDredactedkmS7fCeZPzO/6IR9B3RU
+export CLUSTER_API_KEY=UV3UB3YBIMAGAYIQR4J
 
-### Look at logs
+export TOPIC=cfic_0
+export OFFSET=latest
+export GROUP=semaphore_1
+```
 
+start publishing
 
-docker compose logs broker | grep 24.163.48.106
-
-Install the offset Explorer (UI tool)
-
-https://kafkatool.com/download.html
-
-
+```shell
+export PUBLISHER_PROGRAM=./publish_clients.py
+export PUBLISHER_TIMER=300
+chmod 755 start_publishig.sh
+```
 
 ## Documentation
 
@@ -276,6 +390,12 @@ The first client in the `payload` is shown. There are a number of clients. Note 
 When running multiple_events, the output format is slightly different. Note the 'm_0' reference.
 
 To reference `payload` in the rulebook, you need to reference `events.m_0.payload` if it matched the first conditional.
+
+```shell
+ansible-rulebook -r rb.multi_events.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
+```
+
+The abbreviated output is shown:
 
 ```shell
 2023-05-09 21:06:12,307 - ansible_rulebook.rule_set_runner - INFO - action args: {'pretty': True}
