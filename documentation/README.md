@@ -22,7 +22,7 @@ Enter file in which to save the key (/Users/joelking/.ssh/id_rsa): droplet_cfic
 
 Create a Droplet
 
-ubuntu-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
+cfic-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
 
 and provide the ssh key during the setup.
 
@@ -55,7 +55,7 @@ sudo apt install libsystemd-dev
 pip3 install --upgrade pip
 ```
 
-Create a virtual environment
+Create a virtual environment for the publisher (semaphore) and for Event-Driven Ansible
 
 ```shell
 python3 -m venv eda
@@ -101,16 +101,12 @@ aiobotocore
 aiohttp
 aiokafka
 watchdog
-systemd-python
 dpath
-requests
 importlib-resources
 ```
 
-export PKG_CONFIG_PATH
-
 pip install -r requirements.txt
-
+pip install systemd-python           # error when running in requirements.txt
 
 pip install ansible-rulebook
 
@@ -167,9 +163,7 @@ git clone https://<personal_access_token_here>@github.com/netcraftsmen/cfic.git
 
 ### Clone Semaphore
 
-It is public, so there is no need for the personal access token
 
-git clone https://github.com/netcraftsmen/semaphore.git
 
 
 ### Create a snapshot of the Droplet
@@ -179,8 +173,15 @@ shut the Droplet and created a snapshot
 Log back in
 
 ```shell
-cd cfic
-source eda/bin/activate
+cd ~/cfic
+python3 -m venv publisher
+source publisher/bin/activate
+```
+
+It is public, so there is no need for the personal access token
+
+```shell
+git clone https://github.com/netcraftsmen/semaphore.git
 ```
 
 Start up the publisher
@@ -224,7 +225,11 @@ start publishing
 ```shell
 export PUBLISHER_PROGRAM=./publish_clients.py
 export PUBLISHER_TIMER=300
-chmod 755 start_publishig.sh
+./start_publishing.sh
+```
+You will see messages being produced
+```shell
+Produced record | topic: cfic_0, partition: [5], @offset: 1007 | key: L_629378047925028460, value: {"payload": [{"id": "k0c97c9", "mac": "26:f5:a2:3c
 ```
 
 ## Documentation
@@ -305,6 +310,15 @@ from the home directory `ln -s  /root/cfic/cfic/playbooks/ansible.cfg .ansible.c
 
 example of running the rulebook
 
+Log in using a second terminal session to the droplet
+
+```shell
+cd ~/cfic
+source eda/bin/activate
+cd ~/cfic/cfic/playbooks
+```
+
+Set the environment variables
 ```shell
 ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
 ```
