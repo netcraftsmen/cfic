@@ -25,7 +25,7 @@
         offset: "{{ OFFSET }}"              # latest
 
   rules:
-    - name: example of matching on a specific value(s)
+    - name: Example of matching on a specific value(s)
       enabled: true                         # enabled for testing
       condition:
         any:                                # or `all`

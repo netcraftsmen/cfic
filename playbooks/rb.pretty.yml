@@ -25,7 +25,7 @@
         offset: "{{ OFFSET }}"              # latest
 
   rules:
-    - name: example of matching on a specific value(s)
+    - name: Example of visualizing the data from Kafka
       enabled: true                         # enabled for testing
       condition: event.payload is defined
       actions:

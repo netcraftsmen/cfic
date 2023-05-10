@@ -1,24 +1,24 @@
 #!/usr/bin/env ansible-playbook
 ---
 #
-#      Copyright (c) 2023
+#      Copyright (c) 2023 BlueAlly NetCraftsmen, LLC
 #      All rights reserved.
 #
 #      Author: @joelwking
 #
 #      Usage:  <called from Event-Driven Ansible>
 #
-#      This playbook processes and filters events from Kafka  . . .
+#      This playbook illustrates how events are passed to a playbook
 #
 - name: Filter Events from Kafka
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
 
   vars:
     input: '{{ ansible_eda.event.payload }}'
 
   tasks:
-    - name: loop through the event
+    - name: Loop through the event
       ansible.builtin.debug:
-         var: item.id
-      loop: '{{ ansible_eda.event.payload }}'
+        var: item.id
+      loop: '{{ input }}'

@@ -8,10 +8,10 @@
 #
 #      Usage:  <called from Event-Driven Ansible>
 #
-#      This playbook processes Kafka events from Event-Driven Ansible, creating artifacts
-#      in the Splunk SOAR platform
+#      This playbook processes Kafka events from Event-Driven Ansible, creating
+#      containers and artifacts (events) in the Splunk SOAR platform
 #
-- name: Create an artifacts in Splunk SOAR
+- name: Create containers and artifacts in Splunk SOAR
   hosts: localhost
   connection: local
   gather_facts: no
@@ -24,12 +24,6 @@
     container_id: 0  # If container_id is passed as an extra_var, use the container specified.
 
   tasks:
-    - name:
-      ansible.builtin.debug:
-        msg:
-         - '{{ networkName }}'
-           # - '{{ ansible_eda.event }}'
-
     - name: Create Container
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
