@@ -33,5 +33,6 @@
           name: pb.soar.yml
           delay: 1                          # optional, in seconds
           extra_vars:
-            networkName: BAR    
+            networkName: BAR
+            container_id: 0                 # create new container
           verbosity: 1

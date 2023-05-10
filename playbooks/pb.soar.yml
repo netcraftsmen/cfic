@@ -21,6 +21,7 @@
     server: "{{ lookup('ansible.builtin.env', 'SOAR_SERVER') }}"
     # extra_vars
     networkName: foo
+    container_id: 0  # If container_id is passed as an extra_var, use the container specified.
 
   tasks:
     - name:
@@ -41,17 +42,18 @@
           severity: medium
           tags: ['network_clients']
       register: result
+      when: container_id == 0 
 
     - name: Create Artifacts
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
         authtoken: '{{ authtoken }}'
-        container_id: '{{ result.container_id }}'
+        container_id: '{{ result.container_id | default(container_id) }}'
         artifact:
           name: '{{ item.id }}'
           description: '{{ item.description }}'
           source_data_identifier: '{{ item.id }}'
-          tags: ['{{ item.status }}', '{{ item.recentDeviceConnection }}', '{{ item.ssid }}']
+          tags: ['{{ item.status }}', '{{ item.recentDeviceConnection }}']
           type: "network"
           label: "network_clients"
         cef:

@@ -99,10 +99,8 @@ kafka-topics --bootstrap-server broker:9092 \
              --topic cfic_0
 
 
-# Verify connectivity
 
- nc -zv 68.183.30.227 9092
-Connection to 68.183.30.227 9092 port [tcp/*] succeeded!
+
 
 ### Look at logs
 
@@ -154,6 +152,15 @@ export CLUSTER_API_KEY=UV3UB3YBIMAGAYIQR4J
 export TOPIC=cfic_0
 export OFFSET=latest
 export GROUP=semaphore_1
+```
+
+#### Verify network connectivity to the Kafka Broker
+
+Verify connectivity to the Kafka Broker defined in the environment variables by using `netcat`.
+
+```shell
+# nc -zv $CLUSTER_HOST $CLUSTER_PORT
+Connection to pkc-n00kk.us-east-1.aws.confluent.cloud 9092 port [tcp/*] succeeded!
 ```
 ### Splunk SOAR
 
@@ -213,3 +220,99 @@ ssh -i ~/.ssh/id_ed25519 phantom@52.3.242.131
 Login to the web UI using `soar_local_admin` and the instance ID `i-04647a8ebf382b26a`
 
 Change the password of the `soar_local_admin` account. Get the API key from the `automation` userid.
+
+
+
+## Debugging messages received from Kafka
+
+Run this rulebook to determine what data is being returned from Kafka
+
+```shell
+ansible-rulebook -r rb.pretty.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
+```
+
+The first client in the `payload` is shown. There are a number of clients. Note the format of the message from Kafka is controlled by the publisher, in this case semaphore `publish_clients.py`
+
+```shell
+2023-05-09 21:00:27,138 - ansible_rulebook.rule_set_runner - INFO - action args: {'pretty': True}
+{'meta': {'received_at': '2023-05-09T21:00:26.965010Z',
+          'source': {'name': 'netcraftsmen.kafka.consumer',
+                     'type': 'netcraftsmen.kafka.consumer'},
+          'uuid': '0d39a059-c748-41ae-9ddc-c104ca8cc587'},
+ 'network': 'L_629378047925028460',
+ 'networkName': 'SWISSWOOD',
+ 'payload': [{'adaptivePolicyGroup': None,
+              'description': 'JOEL-HP-Win10',
+              'deviceTypePrediction': None,
+              'firstSeen': '2017-05-07T20:21:44Z',
+              'groupPolicy8021x': None,
+              'id': 'k71b918',
+              'ip': '192.168.5.26',
+              'ip6': '2600:1004:b0a1:b488:dd89:ffe6:92d6:c1c6',
+              'ip6Local': 'fe80:0:0:0:5e87:4285:dbd0:2f6a',
+              'lastSeen': '2023-05-09T17:42:36Z',
+              'mac': '7c:b0:c2:ad:38:24',
+              'manufacturer': 'Intel',
+              'networkName': 'SWISSWOOD',
+              'notes': None,
+              'organizationId': '530205',
+              'os': 'Windows 10',
+              'pskGroup': None,
+              'recentDeviceConnection': 'Wireless',
+              'recentDeviceMac': 'e0:55:3d:25:38:60',
+              'recentDeviceName': 'OFFICE_WP',
+              'recentDeviceSerial': 'Q2JD-J78J-KF9E',
+              'smInstalled': False,
+              'ssid': 'SWISSWOOD-WiFi',
+              'status': 'Offline',
+              'switchport': None,
+              'usage': {'recv': 197888, 'sent': 277040, 'total': 474928},
+              'user': None,
+              'vlan': '5'},
+```
+
+## Multievents
+
+When running multiple_events, the output format is slightly different. Note the 'm_0' reference.
+
+To reference `payload` in the rulebook, you need to reference `events.m_0.payload` if it matched the first conditional.
+
+```shell
+2023-05-09 21:06:12,307 - ansible_rulebook.rule_set_runner - INFO - action args: {'pretty': True}
+{'m_0': {'meta': {'received_at': '2023-05-09T21:06:12.188843Z',
+                  'source': {'name': 'netcraftsmen.kafka.consumer',
+                             'type': 'netcraftsmen.kafka.consumer'},
+                  'uuid': 'c59cdce1-872c-4535-ac50-3c7adb79747b'},
+         'network': 'L_629378047925028460',
+         'networkName': 'SWISSWOOD',
+         'payload': [{'adaptivePolicyGroup': None,
+                      'description': 'JOEL-HP-Win10',
+                      'deviceTypePrediction': None,
+                      'firstSeen': '2017-05-07T20:21:44Z',
+                      'groupPolicy8021x': None,
+                      'id': 'k71b918',
+                      'ip': '192.168.5.26',
+                      'ip6': '2600:1004:b0a1:b488:dd89:ffe6:92d6:c1c6',
+                      'ip6Local': 'fe80:0:0:0:5e87:4285:dbd0:2f6a',
+                      'lastSeen': '2023-05-09T17:42:36Z',
+                      'mac': '7c:b0:c2:ad:38:24',
+                      'manufacturer': 'Intel',
+                      'networkName': 'SWISSWOOD',
+                      'notes': None,
+                      'organizationId': '530205',
+                      'os': 'Windows 10',
+                      'pskGroup': None,
+                      'recentDeviceConnection': 'Wireless',
+                      'recentDeviceMac': 'e0:55:3d:25:38:60',
+                      'recentDeviceName': 'OFFICE_WP',
+                      'recentDeviceSerial': 'Q2JD-J78J-KF9E',
+                      'smInstalled': False,
+                      'ssid': 'SWISSWOOD-WiFi',
+                      'status': 'Offline',
+                      'switchport': None,
+                      'usage': {'recv': 197888,
+                                'sent': 277040,
+                                'total': 474928},
+                      'user': None,
+                      'vlan': '5'},
+```
