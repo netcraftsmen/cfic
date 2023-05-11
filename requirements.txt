@@ -12,7 +12,7 @@ ansible-rulebook
 # aiohttp
 # aiokafka
 # watchdog
-# systemd-python
 # dpath
 #
 requests
+# systemd-python

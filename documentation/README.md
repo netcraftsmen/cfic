@@ -1,17 +1,25 @@
-# README.md
+# Cisco Federal Innovation Challenge
 
-## References
+This repository contains installation instructions and operational instructions for an Event-Driven Ansible (EDA) deployment using Kafka running on Confluent Cloud. Included is a Kafka Publisher that queries the Meraki Cloud for network clients, and publishes the result to Kafka.
 
-Useful references for Event Driven Ansible
+The Ansible Rulebook consumes messages from the Kafka Topic, then invokes a Playbook to create a Splunk SOAR event (container and artifacts) with the client data defined in the Common Event Format (CEF) standard format. CEF defines a syntax used as an interoperability standard for data sharing among security products.
 
-* 6 Guidelines for creating custom source plugins for Event-Driven Ansible! <https://www.youtube.com/watch?v=4f7ARUnVZmY>
-* AIOKafka <https://aiokafka.readthedocs.io/en/stable/api.html>
+## Demonstration Environment
+
+The demonstration environment consists of virtual machine (a DigitalOcean Droplet) supporting publishing and consumption of Kafka messages. The code to publish events is public and available on Cisco DevNet Code Exchange as [semaphore](https://developer.cisco.com/codeexchange/github/repo/netcraftsmen/semaphore/). This repository contains the remaining solution artifacts.
+
+The Splunk SOAR instance is deployed from [AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-4ac4q4lzrhh4a) from an Amazon Machine Image (AMI). Splunk SOAR offers a community edition of the product enabling developer access without incurring and license fees.
 
 ## Installation
 
-Installation documentation when installing on Digital Ocean 
+These installation instructions use [DigitalOcean](https://www.digitalocean.com/) as a cloud service provider. The solution does not leverage any proprietary feature of DigitalOcean, other than simplicity, cost and ease of use.
 
-Create a SSH key for the Droplet
+
+### Create SSH key
+
+When creating a Droplet, you must create a SSH key if one is not available in our account. Create a SSH key for the Droplet. Refer to [How to Set Up SSH Keys ...](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-20-04) for more details.
+
+Create a key pair on the client machine (your computer):
 
 ```shell
 cd ~/.ssh
@@ -20,28 +28,36 @@ Generating public/private rsa key pair.
 Enter file in which to save the key (/Users/joelking/.ssh/id_rsa): droplet_cfic
 ```
 
-Create a Droplet
+### Create a Droplet
 
-cfic-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
-
-and provide the ssh key during the setup.
-
-SSH to the Droplet
-
-
-ssh root@137.184.215.79 -i ~/.ssh/droplet_cfic
+From your DigitalOcean account, select the **Droplets** tab and create a Droplet. For texting and evaulation purposes, these machine resources are sufficient. 
 
 ```
+cfic-s-2vcpu-2gb-nyc1-01 / 2 GB Memory / 60 GB Disk / NYC1 - Ubuntu 20.04 (LTS) x64
+```
 
-Make a directory to house the installation
+Follow the instructions to provide the SSH key during the setup.
+
+### SSH to the Droplet
+
+From your client machine, SSH to the Droplet. The IPv4 address is shown on the GUI after the Droplet is created. Use the `-i` switch to reference the SSH identity file.
+
+```shell
+ssh root@<droplet_ipv4_address> -i ~/.ssh/droplet_cfic
+```
+
+### Create a directory for the installation
+
+Create a directory for the installation.
 
 ```shell
 mkdir cfic
 cd cfic
 ```
 
+### Update and Install necessary packages
 
-Install software
+Update and install the necessary packages.
 
 ```shell
 sudo apt update
@@ -55,17 +71,18 @@ sudo apt install libsystemd-dev
 pip3 install --upgrade pip
 ```
 
-Create a virtual environment for the publisher (semaphore) and for Event-Driven Ansible
+### Create a virtual environment
+
+Create a virtual environment for the Event-Driven Ansible installation.
 
 ```shell
 python3 -m venv eda
 source eda/bin/activate
 ```
 
-Download the JAVA package
+### Install Java
 
-# https://www.oracle.com/java/technologies/downloads/
-# https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts
+Event-Driven Ansible requires Java. Download the JAVA package. Refer to <https://www.oracle.com/java/technologies/downloads/>. Java version 20.0.1 is used.
 
 ```shell
 wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
@@ -73,27 +90,26 @@ sudo apt-get -qqy install ./jdk-20_linux-x64_bin.deb
 ls /usr/lib/jvm
 sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-20/bin/java 2020
 ```
-Verify the version of JAVA
+
+Verify the installation and version of Java.
 
 ```shell
 java --version
 java 20.0.1 2023-04-18
 Java(TM) SE Runtime Environment (build 20.0.1+9-29)
 Java HotSpot(TM) 64-Bit Server VM (build 20.0.1+9-29, mixed mode, sharing)
-root@cfic-s-2vcpu-2gb-nyc1-01:~/cfic#
 ```
 
+### Install Ansible and Ansible Rulebook
 
-
-Install Ansible rulebook
+While in the Python virtual environment `eda`, install Ansible and Ansible Rulebook.
 
 ```shell
 pip install testresources
 pip install ansible
 ```
 
-https://raw.githubusercontent.com/ansible/event-driven-ansible/main/requirements.txt
-Create requirements.txt with these entries:
+Create a file [requirements.txt](https://raw.githubusercontent.com/ansible/event-driven-ansible/main/requirements.txt) with these entries:
 
 ```
 azure-servicebus
@@ -105,11 +121,21 @@ dpath
 importlib-resources
 ```
 
+Use pip to install the above requirements.
+
+```shell
 pip install -r requirements.txt
-pip install systemd-python           # error when running in requirements.txt
+pip install systemd-python
+```
+>Note: installing `systemd-python` from the `requirements.txt` file is a problem, install separately.
 
+Install Ansible Rulebook:
+
+```shell
 pip install ansible-rulebook
+```
 
+Verify the installation and version.
 
 ```shell
 ansible-rulebook --version
@@ -121,23 +147,19 @@ __version__ = '0.13.0'
   Python version = 3.8.10 (default, Mar 13 2023, 10:26:41) [GCC 9.4.0]
 ```
 
-Install the Event-Drive Ansible collection
+Install the Event-Driven Ansible collection. By default it will install in `/root/.ansible/collections/ansible_collections`.
 
 ```shell
 ansible-galaxy collection install ansible.eda
 ```
 
+>Note: use `ansible-galaxy collection list` to view the installed collections and their locations.
 
+### Install Docker
 
-```
+The Kafka publisher in [semaphore](https://developer.cisco.com/codeexchange/github/repo/netcraftsmen/semaphore/) can run in a container. Install Docker.
 
-## Installed Docker on the Droplet
-
-Using these instructions, installed Docker to run Kafka in a container
-
-<https://docs.docker.com/engine/install/ubuntu/>
-
-### install docker
+These are the recommended instructions <https://docs.docker.com/engine/install/ubuntu/>, or use these notes.
 
 ```shell
 sudo apt-get remove docker docker-engine docker.io containerd runc
@@ -152,25 +174,27 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+Verify the installation.
+
+```shell
 sudo docker run hello-world
 ```
 
-### Clone the repository
+### Clone this repository
 
-Create a personal access token in GitHub and then clone the repository
+This repository is private (currently). You need permissions to read the private repository and a [personal access token](https://github.com/settings/tokens) on your GitHub account. 
 
+Create a **personal access token** in GitHub and then clone the repository using the token. 
+
+```shell
+cd ~/cfic
 git clone https://<personal_access_token_here>@github.com/netcraftsmen/cfic.git
+```
 
-### Clone Semaphore
+### Clone the Kafka publisher, Semaphore
 
-
-
-
-### Create a snapshot of the Droplet
-
-shut the Droplet and created a snapshot
-
-Log back in
+Create a Python virtual environment for the `semaphore` code.
 
 ```shell
 cd ~/cfic
@@ -178,32 +202,57 @@ python3 -m venv publisher
 source publisher/bin/activate
 ```
 
-It is public, so there is no need for the personal access token
+This repository is public, there is no need for a **personal access token**.
 
 ```shell
 git clone https://github.com/netcraftsmen/semaphore.git
 ```
 
-Start up the publisher
+Install the Python packages required.
 
 ```shell
 cd ~/cfic/semaphore/
 pip install -r requirements.txt
 ```
 
+### Create a snapshot of the Droplet
+
+All software and packages are installed, optionally shutdown the Droplet create a snapshot. Use the **images** tab on the DigitalOcean GUI to create a snapshot with the Droplet **OFF**.
+
+```shell
+sudo shutdown now -h
+```
+
+After the snapshot is complete, turn the Droplet **ON** and log (SSH) back to the Droplet.
+
+### Start publishing to Kafka in Confluent Cloud
+
+If you are unfamiliar with configuring Kafka in Confluent Cloud, review this Meetup session:
+[Programmability and Automation Meetup - Introduction to network telemetry using Apache Kafka]
+(https://www.youtube.com/watch?v=ABMcflO1ix8)
+
+From the Kafka implementation, the Bootstrap server FQDN, port, API Key and Secret, along with the name of the Kafka Topic is required. These values are specified in environment variables. Make a note of them.
+
+### Publish messages to Kafka
+
+Enter the `library` directory with the Python **publisher** virtual environment active.
+
 ```shell
 cd ~/cfic/semaphore/library
 ```
 
-### Meraki Dashboard
+#### Meraki Dashboard API key
 
-The semaphore program requires the Meraki dashboard API key and a timer configured
+The **semaphore** program requires the Meraki dashboard API key and a timer. These values are provided using environment variables.
 
 ```shell
 export MERAKI_DASHBOARD_API_KEY=1c6fc04dd872a2redacted10275f5aaa17d34a
 export MERAKI_TIMESPAN=43200
 ```
-It also needs the Confluent Cloud variables
+
+#### Confluent Cloud configuration
+
+It also needs the Confluent Cloud variables. In the follow, replace the FQDN of the Kafka Bootstrap server, the cluster API secret and key, and the name of the Kafka topic. Then specify these using environment variables.
 
 ```bash
 export BOOTSTRAP_SERVER=pkc-n00kk.us-east-1.aws.confluent.cloud:9092
@@ -211,77 +260,69 @@ IFS=':'    # Set colon as delimiter
 read -a cluster <<< "$BOOTSTRAP_SERVER"
 export CLUSTER_HOST=${cluster[0]}
 export CLUSTER_PORT=${cluster[1]}
-
+#
 export CLUSTER_API_SECRET=KTI3pZBFYs4Xp91WuFSY3yrKDredactedkmS7fCeZPzO/6IR9B3RU
 export CLUSTER_API_KEY=UV3UB3YBIMAGAYIQR4J
-
+#
 export TOPIC=cfic_0
-export OFFSET=latest
-export GROUP=semaphore_1
-```
-
-start publishing
-
-```shell
-export PUBLISHER_PROGRAM=./publish_clients.py
-export PUBLISHER_TIMER=300
-./start_publishing.sh
-```
-You will see messages being produced
-```shell
-Produced record | topic: cfic_0, partition: [5], @offset: 1007 | key: L_629378047925028460, value: {"payload": [{"id": "k0c97c9", "mac": "26:f5:a2:3c
-```
-
-## Documentation
-
-https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
-
-
-## Testing an event source outside of a rulebook
-
-You can test your event_source by running from a python interpreter.
-
-~/cfic/cfic/collections/ansible_collections/netcraftsmen/kafka/plugins/event_source# python3 consumer.py
-
-## Environment variables
-
-### Meraki Dashboard
-
-The semaphore program requires the Meraki dashboard API key and a timer configured
-
-```shell
-export MERAKI_DASHBOARD_API_KEY=1c6fc04dd872a2redacted10275f5aaa17d34a
-export MERAKI_TIMESPAN=43200
-```
-
-### Kafka Cluster
-
-Both the publisher and consumer (client) require several environment variables
-
-```bash
-export BOOTSTRAP_SERVER=pkc-n00kk.us-east-1.aws.confluent.cloud:9092
-IFS=':'    # Set colon as delimiter
-read -a cluster <<< "$BOOTSTRAP_SERVER"
-export CLUSTER_HOST=${cluster[0]}
-export CLUSTER_PORT=${cluster[1]}
-
-export CLUSTER_API_SECRET=KTI3pZBFYs4Xp91WuFSY3yrKDredactedkmS7fCeZPzO/6IR9B3RU
-export CLUSTER_API_KEY=UV3UB3YBIMAGAYIQR4J
-
-export TOPIC=cfic_0
+#
 export OFFSET=latest
 export GROUP=semaphore_1
 ```
 
 #### Verify network connectivity to the Kafka Broker
 
-Verify connectivity to the Kafka Broker defined in the environment variables by using `netcat`.
+Verify the Kafka Broker is listening on TCP port 9092 (port 9092 is the default value) and the environment variables are configured by using `netcat`.
 
 ```shell
 # nc -zv $CLUSTER_HOST $CLUSTER_PORT
 Connection to pkc-n00kk.us-east-1.aws.confluent.cloud 9092 port [tcp/*] succeeded!
 ```
-### Splunk SOAR
+
+### Publish messages
+
+The Bash script runs the program every `n` seconds. Configure the name of the program and a timer value, then execute the script.
+
+```shell
+export PUBLISHER_PROGRAM=./publish_clients.py
+export PUBLISHER_TIMER=300
+./start_publishing.sh
+```
+
+After a few seconds, you should see the confirmation that a message is produced. 
+
+```shell
+Produced record | topic: cfic_0, partition: [5], @offset: 1007 | key: L_629378047925028460, value: {"payload": [{"id": "k0c97c9", "mac": "26:f5:a2:3c
+```
+
+>Note: Use CTL + C to stop the shell script. If you leave the publisher running too long before you consume messages, you may exhaust the CPU and memory of this minimally configured Droplet.
+
+### Testing an event source program
+
+You can test an Ansible event_source plugin (standalone, separate from being called by a Runbook) by running from a Python interpreter. Activate the Python virtual environment.
+
+```shell
+cd ~/cfic 
+source eda/bin/activate
+```
+Enter the directory where your Ansible event_source plugin resides.
+
+```shell
+cd ~/cfic/cfic/collections/ansible_collections/netcraftsmen/kafka/plugins/event_source
+python3 consumer.py
+```
+
+>Note: This is used for debugging purposes in [developing](https://ansible-rulebook.readthedocs.io/en/stable/sources.html#how-to-develop-a-custom-plugin) event_source plugins, it may expose credentials to the terminal. Only use in a development environment.
+
+This program displays the arguments and waits to receive Kafka messages.
+
+```
+{'password': 'KTI3pZBFYs4Xp9agredactedEi8rkEOd0kmS7fCeZPzO/6IR9B3RU', 'username': 'UV3UB3YIAMGAYIQR4J', 'topic': 'cfic_0', 'host': 'pkc-n00kk.us-east-1.aws.confluent.cloud', 'port': '9092', 'cafile': None, 'certfile': None, 'keyfile': None, 'check_hostname': False, 'offset': 'latest'}
+```
+
+Use CTL + C to exit the program.
+
+### Installing Splunk SOAR
 
 Auth Token for Phantom (Splunk SOAR)  configure this under the user configuration screen for user `automation`
 
@@ -450,3 +491,18 @@ The abbreviated output is shown:
                       'user': None,
                       'vlan': '5'},
 ```
+
+
+## References
+
+Useful references for Event Driven Ansible
+
+* 6 Guidelines for creating custom source plugins for Event-Driven Ansible! <https://www.youtube.com/watch?v=4f7ARUnVZmY>
+* AIOKafka <https://aiokafka.readthedocs.io/en/stable/api.html>
+
+# https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts
+
+
+## Documentation
+
+https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
