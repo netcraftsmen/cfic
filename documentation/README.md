@@ -275,11 +275,11 @@ export GROUP=semaphore_1
 Verify the Kafka Broker is listening on TCP port 9092 (port 9092 is the default value) and the environment variables are configured by using `netcat`.
 
 ```shell
-# nc -zv $CLUSTER_HOST $CLUSTER_PORT
+nc -zv $CLUSTER_HOST $CLUSTER_PORT
 Connection to pkc-n00kk.us-east-1.aws.confluent.cloud 9092 port [tcp/*] succeeded!
 ```
 
-### Publish messages
+### Publish Messages
 
 The Bash script runs the program every `n` seconds. Configure the name of the program and a timer value, then execute the script.
 
@@ -322,36 +322,56 @@ This program displays the arguments and waits to receive Kafka messages.
 
 Use CTL + C to exit the program.
 
-### Installing Splunk SOAR
+## Splunk SOAR
 
-Auth Token for Phantom (Splunk SOAR)  configure this under the user configuration screen for user `automation`
+In this solution messages published to Kafka are consumed by the Event-Driven Ansible Rulebook `playbooks/rb.kafka.yml`, and passed to the associate playbook `playbooks/pb.soar.yml` for processing. The playbook invokes a custom Ansible module to create security events (containers and artifacts) in SPLUNK SOAR.
 
+### Installation
+
+Refer to the [Installation instructions for Splunk SOAR](https://docs.splunk.com/Documentation/SOARonprem/6.0.0/Install/InstallAMI) and the *usage* instructions associated with the AMI documentation. The are summarized here.
+
+ * Allow 5-10 minutes after launching the Splunk SOAR On-premises server for the setup process to complete.
+ * In your EC2 Management Console, find your instance running Splunk SOAR On-premises. Copy its public IP and Paste the public IP into a new browser tab.
+ * Log into Splunk SOAR On-premises with the following credentials: ** username: soarlocaladmin ** password: the AWS instance id ex: i-04ad4f23eaje76530
+
+>Note: The version tested is `6.0.0.114895`.
+
+Instructions for installing SOAR OnPrem are at: <https://docs.splunk.com/Documentation/SOARonprem/latest/Install/Login>
+
+Following launching of the instance, create a security group and apply to the instance. Allow SSH and HTTPS, HTTP and TCP port 9999 from your source IP address (or include your team's IP address.)
+
+#### SSH access (optional)
+
+The SSH username: is **phantom**. If you need root access, use `sudo su -`. You should be able to connect to the instance via SSH using the key-pair assigned at launch.
+
+```shell
+ssh -i ~/.ssh/id_ed25519 phantom@52.3.242.131
+```
+
+>NOTE: SSH access is used to develop custom applications and to gracefully shutdown the system.
+
+#### Web UI access
+
+Login to the web UI using `soar_local_admin` and the instance ID (e.g. `i-04647a8ebf382b26a`) change the password of the `soar_local_admin` account. 
+
+#### Obtain the API Key
+
+The Splunk SOAR API uses a bearer token for authentication. You must copy (or create) an Auth Token under the user configuration screen for user `automation`. The token can be downloaded and is presented as JSON.
+
+```json
 { "ph-auth-token": "1GvdkA220zFlbJMjIredactedRXmhmm9QANjCg0k=","server": "https://54.144.142.30" }
+```
+
+From your terminal session on the Droplet, provide these values in environment variables.
 
 ```shell
 export SOAR_AUTHTOKEN="1GvdkA220zFlbJMjISwCl9NredactedXmhmm9QANjCg0k="
 export SOAR_SERVER=ec2-54-144-142-30.compute-1.amazonaws.com
 ```
 
-### Ansible Config file
+## Executing an Ansible Rulebook
 
-You need to set the ENV variable for ansible-rulebook to locate the configuration file.
-
-https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file
-
-export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
-
->Note: do not use relative paths
-
->NOTE Test using a symbolic link
-
-from the home directory `ln -s  /root/cfic/cfic/playbooks/ansible.cfg .ansible.cfg`
-
-## Running a rulebook 
-
-example of running the rulebook
-
-Log in using a second terminal session to the droplet
+To facilitate publishing messages and consuming them with Event-Driven Ansible, logon the Droplet with a second terminal session. Activate the Python virtual environment and enter the `cfic/playbook` directory. 
 
 ```shell
 cd ~/cfic
@@ -359,48 +379,36 @@ source eda/bin/activate
 cd ~/cfic/cfic/playbooks
 ```
 
-Set the environment variables
+### Ansible Config file
+
+By default, Ansible looks in the playbook directory for an [ansible.cfg](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file) configuration file. However, this convention does not appear to be honored by `ansible-rulebook`.  You need to set the ENV variable for ansible-rulebook to locate the configuration file.
+
+To circumvent the issue, create an environment variable, **ANSIBLE_CONFIG**. Do not use a relative path.
+
 ```shell
-ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
+export ANSIBLE_CONFIG=/root/cfic/cfic/playbooks/ansible.cfg
 ```
 
-## Splunk SOAR
+Optionally, from the home directory, create a symbolic link `ln -s  /root/cfic/cfic/playbooks/ansible.cfg .ansible.cfg`
 
-Installation instructions for Splunk SOAR 
-
-https://docs.splunk.com/Documentation/SOARonprem/6.0.0/Install/InstallAMI
-
-Refer to https://github.com/joelwking/csna_/blob/main/DEVELOPMENT_NOTES.md  **HOWEVER** these instructions may be OUT OF DATE!
-
-The version installed is `version 6.0.0.114895`.
-
-Following launching of the instance, create a security group and apply to the instance
-
-Allow SSH and HTTPS, HTTP and TCP port 9999 from your source IP address (or include your team's IP address.)
-
-You should be able to connect to the instance via SSH using the key-pair assigned at launch
-
+```shell
+(eda) root@cfic-s-2vcpu-2gb-nyc1-01:~# ls -salt .ansible.cfg
+0 lrwxrwxrwx 1 root root 37 May 11 17:00 .ansible.cfg -> /root/cfic/cfic/playbooks/ansible.cfg
 ```
-ssh -i ~/.ssh/id_ed25519 phantom@52.3.242.131
-```
->Note: In order to log in to the operating system of your AMI-based installation using SSH, use the user id `phantom`. If you need root access, use `sudo su -`.
 
-<https://docs.splunk.com/Documentation/SOARonprem/latest/Install/Login>
-Login to the web UI using `soar_local_admin` and the instance ID `i-04647a8ebf382b26a`
+### View the messages from Kafka
 
-Change the password of the `soar_local_admin` account. Get the API key from the `automation` userid.
+You will need to set the environment variables for Splunk SOAR and Kafka! Refer to the section `Publish Messages`. From your alternate terminal session, publish messages to Kafka using the `./start_publishing.sh` shell script.
 
-
-
-## Debugging messages received from Kafka
-
-Run this rulebook to determine what data is being returned from Kafka
+Run rulebook `rb.pretty.yml` to determine what (if any) messages are returned from Kafka.
 
 ```shell
 ansible-rulebook -r rb.pretty.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
 ```
 
-The first client in the `payload` is shown. There are a number of clients. Note the format of the message from Kafka is controlled by the publisher, in this case semaphore `publish_clients.py`
+The output from this rulebook provides a view of the message schema. It is useful for referencing variables from a playbook invoked by the rulebook. Variable `meta` is created by **ansible-rulebook**, while `network`, `networkName` and `payload` are generated by the Kafka publisher, in this case **semaphore** program `publish_clients.py`
+
+The first client in the `payload` is shown. There are a number of clients. 
 
 ```shell
 2023-05-09 21:00:27,138 - ansible_rulebook.rule_set_runner - INFO - action args: {'pretty': True}
@@ -440,17 +448,40 @@ The first client in the `payload` is shown. There are a number of clients. Note 
               'vlan': '5'},
 ```
 
-## Multievents
+### Execute the Rulebook and Playbook
 
-When running multiple_events, the output format is slightly different. Note the 'm_0' reference.
+The rulebook `playbooks/rb.kafka.yml` receives messages from Kafka and invokes an Ansible playbook to load the data into Splunk SOAR.
 
-To reference `payload` in the rulebook, you need to reference `events.m_0.payload` if it matched the first conditional.
+Execute it.
+
+```shell
+ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
+```
+
+Provided all environment variables are properly set, data from the Meraki dashboard is posted as an event (container and artifact(s)) in Splunk SOAR.
+
+## How variables are passed (and referenced) in a playbook
+
+The playbook `playbooks/pb.debug.yml` illustrates how variables are passed and referenced by a playbook for singular events. In the reference schema *payload* `'{{ ansible_eda.event.payload }}'` is a list and can be used in a loop.
+
+Rulebooks with **multi-events** have a slightly different format.
+
+## Multi-Events
+
+When configuring a Rulebook for [multiple_events](https://ansible-rulebook.readthedocs.io/en/stable/multi_events.html), the output format is slightly different.
+
+
+>Note: the 'm_0', 'm_1', etc. reference and `events` is plural rather than `event`. 
+
+To reference `payload` in the rulebook, you need to reference `events.m_0.payload` if it matched the first conditional, `events.m_1.payload`.
+
+Execute the `playbooks/rb.multi_events.yml`
 
 ```shell
 ansible-rulebook -r rb.multi_events.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,GROUP,OFFSET,CLUSTER_HOST,CLUSTER_PORT
 ```
 
-The abbreviated output is shown:
+Abbreviated sample output is shown:
 
 ```shell
 2023-05-09 21:06:12,307 - ansible_rulebook.rule_set_runner - INFO - action args: {'pretty': True}
@@ -492,17 +523,16 @@ The abbreviated output is shown:
                       'vlan': '5'},
 ```
 
-
 ## References
 
-Useful references for Event Driven Ansible
+Useful references for Event Driven Ansible:
 
-* 6 Guidelines for creating custom source plugins for Event-Driven Ansible! <https://www.youtube.com/watch?v=4f7ARUnVZmY>
-* AIOKafka <https://aiokafka.readthedocs.io/en/stable/api.html>
+ * 6 Guidelines for creating custom source plugins for Event-Driven Ansible! <https://www.youtube.com/watch?v=4f7ARUnVZmY>
+ * AIOKafka <https://aiokafka.readthedocs.io/en/stable/api.html>
+ * Installing Java on Ubuntu <https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts>
+ * Creating custom event plugins <https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins>
 
-# https://askubuntu.com/questions/1430509/how-to-install-jdk-19-on-ubuntu-22-04-lts
+## Author
 
+Joel W. King @joelwking
 
-## Documentation
-
-https://www.ansible.com/blog/creating-custom-event-driven-ansible-source-plugins
