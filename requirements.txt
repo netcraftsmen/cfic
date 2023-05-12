@@ -16,3 +16,4 @@ ansible-rulebook
 #
 requests
 # systemd-python
+fuzzywuzzy

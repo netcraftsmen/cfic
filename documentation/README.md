@@ -332,7 +332,7 @@ Refer to the [Installation instructions for Splunk SOAR](https://docs.splunk.com
 
  * Allow 5-10 minutes after launching the Splunk SOAR On-premises server for the setup process to complete.
  * In your EC2 Management Console, find your instance running Splunk SOAR On-premises. Copy its public IP and Paste the public IP into a new browser tab.
- * Log into Splunk SOAR On-premises with the following credentials: ** username: soarlocaladmin ** password: the AWS instance id ex: i-04ad4f23eaje76530
+ * Log into Splunk SOAR On-premises with the following credentials: **username: soarlocaladmin** password: the AWS instance id ex: **i-04ad4f23eaje76530**.
 
 >Note: The version tested is `6.0.0.114895`.
 
@@ -469,7 +469,6 @@ Rulebooks with **multi-events** have a slightly different format.
 ## Multi-Events
 
 When configuring a Rulebook for [multiple_events](https://ansible-rulebook.readthedocs.io/en/stable/multi_events.html), the output format is slightly different.
-
 
 >Note: the 'm_0', 'm_1', etc. reference and `events` is plural rather than `event`. 
 
