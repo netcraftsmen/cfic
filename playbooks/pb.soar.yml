@@ -36,8 +36,12 @@
           severity: medium
           tags: ['network_clients']
       register: result
-      when: container_id == 0 
-
+      when: container_id == 0
+    
+    - name: Verify container id
+      ansible.builtin.debug:
+        msg: "{{ result.container_id | default(container_id) }}"
+ 
     - name: Create Artifacts
       netcraftsmen.kafka.soar_event:
         server: '{{ server }}'
@@ -58,5 +62,6 @@
           c6a1Label: 'IPv6Local'
           DeviceVendor: '{{ item.manufacturer }}'
           message: "{{ item.description | default(omit) }}"
-        metadata: {}
+        metadata: '{{ item }}'  # Add the whole payload as metadata
+        # metadata: {}          # Empty dictionary if you don't want metadata
       loop: '{{ ansible_eda.event.payload }}'
