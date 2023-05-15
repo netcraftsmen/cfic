@@ -33,5 +33,5 @@
           delay: 1                          # optional, in seconds
           extra_vars:
             networkName: BAR
-            container_id: 0                 # 0 = create new container
+            container_id: 92                # 0 = create new container
           verbosity: 1
