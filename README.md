@@ -58,41 +58,6 @@ The solution adopts a service-oriented approach to the publishing and consumptio
 
 Initial network automation approaches focused on the integrations of systems in a client/server architecture using Application Programming Interfaces (APIs). Just as software applications have evolved to a service orientated, loosely coupled architecture, so should how modern networks are managed and audited.
 
-## Invitation
+## Author
 
-```text
-From: Christine Hansen (chrhanse) <chrhanse@cisco.com>
-Date: Thursday, April 20, 2023 at 11:40 AM
-To: Bill LaVeck <bill.laveck@n2grate.com>
-Cc: Dan Faules (dfaules) <dfaules@cisco.com>, Jameka Slade (jamslade) <jamslade@cisco.com>, Lee Johnson (leejohns) <leejohns@cisco.com>
-Subject: Join us for the Cisco Federal Innovation Challenge
-
-Hi Bill,
-
-We’d like to invite BlueAlly to join us for the Cisco Federal Innovation Challenge, a challenge aimed at generating ideas for modernizing the federal and defense landscape. We’re calling US developers to join us and showcase their innovative solutions in three focus areas:
-
-Network Automation and NetDevOps
-IT Modernization and Lifecycle Management
-Telemetry and Visualization
-
-The challenge will be hybrid in nature, with the first few weeks taking place virtually and a final Judging Day taking place in person. Teams will first be asked to submit an idea abstract, with accepted abstracts moving on to the solution development phase. The high-level details for the challenge are as follows:
-
-When:
-Registration and Idea Submission: April 24 - May 8, 2023
-Abstract (Initial Idea) Submission Deadline: May 8, 2023 at 8 pm ET
-Solution Development: May 10 - May 23, 2023
-Presentation Day: May 24, 2023
- 
-Where:
-Idea Submission and Solution Development: Virtual
-Presentation Day: In-Person, GSA Workplace Innovation Lab 
- 
-More information:
-Event Overview document (attached - please feel free to share internally if helpful)
-Main challenge site: federalinnovationchallenge.com
- 
-Once again, we’d love to have BlueAlly put forward a team to join us for the Cisco Federal Innovation Challenge! If you have any questions regarding the challenge, please don’t hesitate to reach out.
-
-
-Christine
-```
+Joel W. King @joelwking
