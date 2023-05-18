@@ -9,3 +9,7 @@ playbooks/files/*.cer
 # Do not push cache
 #
 collections/ansible_collections/netcraftsmen/kafka/plugins/module_utils/__pycache__/
+#
+# Do not push demo instructions
+#
+documentation/DEMO_INSTRUCTIONS.md

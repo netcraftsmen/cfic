@@ -455,7 +455,7 @@ The rulebook `playbooks/rb.kafka.yml` receives messages from Kafka and invokes a
 Execute it.
 
 ```shell
-ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT
+ansible-rulebook -r rb.kafka.yml -i inventory.yml -v --env-vars CLUSTER_API_KEY,CLUSTER_API_SECRET,TOPIC,OFFSET,GROUP,CLUSTER_HOST,CLUSTER_PORT,CONTAINER_ID
 ```
 
 Provided all environment variables are properly set, data from the Meraki dashboard is posted as an event (container and artifact(s)) in Splunk SOAR.
