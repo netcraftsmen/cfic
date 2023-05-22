@@ -8,6 +8,36 @@ Cisco is sponsoring a Federal Innovation Challenge to bring together ideas to ac
 
 <https://www.federalinnovationchallenge.com/event/cfic>
 
+## Repository Contents
+
+This repository is intended to be opened with Visual Studio Code (VS Code) for development purposes. It can be cloned and installed in a Linux host. The `documentation/README.md` file is an installation and usage guide.
+
+### Playbooks
+
+The `playbooks` directory contains an `ansible.cfg` (Ansible Configuration File) and `inventory.yml` (Inventory file) needed to execute the rulebooks and playbooks.
+
+For the demonstration, the `rb.kafka.yml` file is used to monitor the Kafka Topic and return messages as they are published.  In turn, it calls playbook `pb.soar.yml` which optionally creates SOAR events (containers) and creates a SOAR artifact for each client published.
+
+Additionally, there are additional rulebooks and playbooks examples of Event-Driven Ansible.
+
+ * rb.pretty.yml
+ * rb.multi_events.yml
+ * pb.debug.yml
+
+>Note: `rb.pretty.yml` returns Kafka messages and 'pretty prints' the messages returned.
+
+### Collections
+
+The `collections/ansible_collections` directory contains a collection `netcraftsmen/kafka`. 
+
+This collection includes modifications to the Ansible Kafka event_source needed to consume Kafka messages from Confluent Cloud. Refer to Event Source Plugins <https://ansible-rulebook.readthedocs.io/en/stable/sources.html>. The file `netcraftsmen/kafka/plugins/event_source/consumer.py` is a modification the the `kafka.py` event source.
+
+The collection contains a module `soar_event` used to interface with the SOAR API. The module documentation can be viewed  by navigating to `cfic/collections/ansible_collections/` and issuing the command to view the module documentation.
+
+```shell
+ansible-doc -M netcraftsmen/kafka/plugins/modules soar_event
+```
+
 ## Abstract
 
 Which use case(s) are you planning on addressing with your solution?*
